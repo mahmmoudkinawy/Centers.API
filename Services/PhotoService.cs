@@ -20,7 +20,10 @@ public sealed class PhotoService : IPhotoService
 
         if (file.Length > 0)
         {
-            using var stream = file.OpenReadStream();
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            stream.Position = 0;
+
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(file.FileName, stream),
@@ -32,5 +35,6 @@ public sealed class PhotoService : IPhotoService
 
         return uploadResult.Url.AbsoluteUri;
     }
+
 
 }

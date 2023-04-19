@@ -39,8 +39,8 @@ public sealed class UserRegisterProcess
                 .NotEmpty();
 
             RuleFor(u => u.PhoneNumber)
-                //.Matches("^(5[0-9]{1}-[0-9]{3}-[0-9]{4})$")
-                //.WithMessage("Your phone number does not appear to be valid for Dubai. Please enter a 10-digit phone number starting with 05.")
+                .Matches("^\\+971(\\s*|\\-)(50|51|52|55|56|2|3|4|6|7|9)\\d{7}$")
+                .WithMessage("Your phone number does not appear to be valid for UAE.")
                 .NotEmpty();
 
             RuleFor(u => u.Email)
@@ -91,26 +91,22 @@ public sealed class UserRegisterProcess
     public sealed class Handler : IRequestHandler<Request, Result<Response>>
     {
         private readonly UserManager<UserEntity> _userManager;
-        private readonly CentersDbContext _context;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ITokenService _tokenService;
-        private readonly IPhotoService _photoService;
         private readonly IMapper _mapper;
 
         public Handler(
             UserManager<UserEntity> userManager,
-            CentersDbContext context,
+            IServiceScopeFactory serviceScopeFactory,
             ITokenService tokenService,
-            IPhotoService photoService,
             IMapper mapper)
         {
             _userManager = userManager ??
                 throw new ArgumentNullException(nameof(userManager));
-            _context = context ??
+            _serviceScopeFactory = serviceScopeFactory ??
                 throw new ArgumentNullException(nameof(userManager));
             _tokenService = tokenService ??
                 throw new ArgumentNullException(nameof(tokenService));
-            _photoService = photoService ??
-                throw new ArgumentNullException(nameof(photoService));
             _mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
         }
@@ -135,18 +131,25 @@ public sealed class UserRegisterProcess
 
             if (request.HasDisability && request.DisabilityImage is not null)
             {
-                var disabilityImageUrl = await _photoService.UploadPhotoAsync(request.DisabilityImage);
-
-                var disability = new DisabilityEntity
+                ThreadPool.QueueUserWorkItem(async _ =>
                 {
-                    Id = Guid.NewGuid(),
-                    HasDisability = request.HasDisability,
-                    ImageUrl = disabilityImageUrl,
-                    OwnerId = user.Id
-                };
+                    using var scope = _serviceScopeFactory.CreateScope();
+                    var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
+                    var photoService = scope.ServiceProvider.GetRequiredService<IPhotoService>();
 
-                _context.Disabilities.Add(disability);
-                await _context.SaveChangesAsync(cancellationToken);
+                    var disabilityImageUrl = await photoService.UploadPhotoAsync(request.DisabilityImage);
+
+                    var disability = new DisabilityEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        HasDisability = request.HasDisability,
+                        ImageUrl = disabilityImageUrl,
+                        OwnerId = user.Id
+                    };
+
+                    context.Disabilities.Add(disability);
+                    await context.SaveChangesAsync(cancellationToken);
+                });
             }
 
             return Result<Response>.Success(new Response
