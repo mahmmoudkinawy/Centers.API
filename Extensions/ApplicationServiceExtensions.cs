@@ -5,7 +5,8 @@ public static class ApplicationServiceExtensions
         this IServiceCollection services,
         IConfiguration config)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddFluentValidation(_ => _.RegisterValidatorsFromAssemblyContaining<Program>());
 
         services.AddDbContext<CentersDbContext>(opts
                 => opts.UseSqlServer(config.GetConnectionString("DefaultConnection")));

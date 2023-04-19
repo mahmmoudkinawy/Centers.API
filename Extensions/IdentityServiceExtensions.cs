@@ -18,7 +18,16 @@ public static class IdentityServiceExtensions
 
         services.AddAuthorization();
 
-        services.AddAuthorization();
+        services.AddAuthorization(builder =>
+        {
+            builder.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
+
+        services.AddMediatR(_ => _.RegisterServicesFromAssemblyContaining<Program>());
+
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         return services;
     }
