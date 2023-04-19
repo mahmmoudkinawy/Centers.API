@@ -1,7 +1,8 @@
 ﻿namespace Centers.API.Controllers;
 
-[Route("api/account")]
+[Route("api/v{version:apiVersion}/account")]
 [ApiController]
+[ApiVersion("1.0")]
 [AllowAnonymous]
 public sealed class AccountController : ControllerBase
 {
@@ -76,7 +77,7 @@ public sealed class AccountController : ControllerBase
     ///     --boundary
     ///     Content-Disposition: form-data; name="phoneNumber"
     ///
-    ///     500-123-4567
+    ///     +971-501234567
     ///     --boundary
     ///     Content-Disposition: form-data; name="email"
     ///

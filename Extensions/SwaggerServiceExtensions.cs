@@ -5,6 +5,15 @@ public static class SwaggerServiceExtensions
     {
         services.AddEndpointsApiExplorer();
 
+        services.AddApiVersioning(opts =>
+        {
+            opts.AssumeDefaultVersionWhenUnspecified = true;
+            opts.ReportApiVersions = true;
+            opts.DefaultApiVersion = new ApiVersion(1, 0);
+        });
+
+        services.AddVersionedApiExplorer(opts => opts.GroupNameFormat = "'v'VVV");
+
         services.AddSwaggerGen(opts =>
         {
             var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
