@@ -7,6 +7,8 @@ public static class ApplicationServiceExtensions
     {
         services.AddScoped<ITokenService, TokenService>();
 
+        services.AddScoped<IPhotoService, PhotoService>();
+
         services.AddMediatR(_ => _.RegisterServicesFromAssemblyContaining<Program>());
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

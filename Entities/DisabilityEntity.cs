@@ -1,6 +1,4 @@
 ﻿namespace Centers.API.Entities;
-
-[Table("Disabilities")]
 public sealed class DisabilityEntity
 {
     public Guid Id { get; set; }

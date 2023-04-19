@@ -3,8 +3,8 @@ public sealed class UserLoginProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public string? Email { get; set; }
+        public string? Password { get; set; }
     }
 
     public sealed class Response

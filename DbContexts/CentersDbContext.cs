@@ -5,6 +5,8 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
 {
     public CentersDbContext(DbContextOptions<CentersDbContext> options) : base(options) { }
 
+    public DbSet<DisabilityEntity> Disabilities { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
