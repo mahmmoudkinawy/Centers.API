@@ -135,25 +135,30 @@ public sealed class UserRegisterProcess
 
             if (request.HasDisability && request.DisabilityImage is not null)
             {
-                ThreadPool.QueueUserWorkItem(async _ =>
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                Task.Run(async () =>
                 {
-                    using var scope = _serviceScopeFactory.CreateScope();
-                    var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
-                    var photoService = scope.ServiceProvider.GetRequiredService<IPhotoService>();
-
-                    var disabilityImageUrl = await photoService.UploadPhotoAsync(request.DisabilityImage);
-
-                    var disability = new DisabilityEntity
+                    using (var scope = _serviceScopeFactory.CreateScope())
                     {
-                        Id = Guid.NewGuid(),
-                        HasDisability = request.HasDisability,
-                        ImageUrl = disabilityImageUrl,
-                        OwnerId = user.Id
-                    };
+                        var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
+                        var photoService = scope.ServiceProvider.GetRequiredService<IPhotoService>();
 
-                    context.Disabilities.Add(disability);
-                    await context.SaveChangesAsync(cancellationToken);
-                });
+                        var disabilityImageUrl = await photoService.UploadPhotoAsync(request.DisabilityImage);
+
+                        var disability = new DisabilityEntity
+                        {
+                            Id = Guid.NewGuid(),
+                            HasDisability = request.HasDisability,
+                            ImageUrl = disabilityImageUrl,
+                            OwnerId = user.Id
+                        };
+
+                        context.Disabilities.Add(disability);
+                        await context.SaveChangesAsync(cancellationToken);
+                    };
+                }, cancellationToken);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+
             }
 
             return Result<Response>.Success(new Response
