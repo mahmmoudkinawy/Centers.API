@@ -12,4 +12,22 @@ public sealed class AccountController : ControllerBase
         _mediator = mediator ??
             throw new ArgumentNullException(nameof(mediator));
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(
+        [FromBody] UserLoginProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return Unauthorized(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
+
 }

@@ -1,6 +1,8 @@
 ﻿namespace Centers.API.Helpers;
 public static class Constants
 {
+    public const string TokenKey = "Token:Key";
+
     public sealed class Roles
     {
         public const string Student = "Student";

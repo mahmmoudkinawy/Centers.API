@@ -12,11 +12,10 @@ public static class IdentityServiceExtensions
         })
             .AddRoles<RoleEntity>()
             .AddRoleManager<RoleManager<RoleEntity>>()
-            .AddUserManager<UserManager<UserEntity>>()
             .AddSignInManager<SignInManager<UserEntity>>()
             .AddEntityFrameworkStores<CentersDbContext>();
 
-        services.AddAuthorization();
+        services.AddAuthentication();
 
         services.AddAuthorization(builder =>
         {
@@ -24,10 +23,6 @@ public static class IdentityServiceExtensions
                 .RequireAuthenticatedUser()
                 .Build();
         });
-
-        services.AddMediatR(_ => _.RegisterServicesFromAssemblyContaining<Program>());
-
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         return services;
     }

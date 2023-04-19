@@ -5,6 +5,12 @@ public static class ApplicationServiceExtensions
         this IServiceCollection services,
         IConfiguration config)
     {
+        services.AddScoped<ITokenService, TokenService>();
+
+        services.AddMediatR(_ => _.RegisterServicesFromAssemblyContaining<Program>());
+
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
         services.AddControllers()
             .AddFluentValidation(_ => _.RegisterValidatorsFromAssemblyContaining<Program>());
 
