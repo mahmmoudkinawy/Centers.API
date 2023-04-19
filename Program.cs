@@ -4,6 +4,8 @@ builder.Services.AddSwaggerServices();
 
 builder.Services.AddApplicationServices(builder.Configuration);
 
+builder.Services.AddConfigureCors();
+
 builder.Services.AddIdentityServices();
 
 var app = builder.Build();
@@ -14,6 +16,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors(Constants.CorsPolicyName);
 
 app.UseAuthentication();
 
