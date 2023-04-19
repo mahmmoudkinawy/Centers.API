@@ -8,7 +8,7 @@ public static class ApplicationServiceExtensions
         services.AddControllers();
 
         services.AddDbContext<CentersDbContext>(opts
-                => opts.UseSqlServer(config.GetConnectionString("DefaulConnection")));
+                => opts.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 
         return services;
     }
