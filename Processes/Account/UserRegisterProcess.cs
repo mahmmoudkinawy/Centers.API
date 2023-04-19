@@ -51,30 +51,34 @@ public sealed class UserRegisterProcess
                 .NotEmpty();
 
             RuleFor(u => u.HasDisability)
-                .NotEmpty();
+                .NotNull();
 
             RuleFor(u => u.DisabilityImage)
-                .NotEmpty()
-                .When(u => u.HasDisability)
-                .WithMessage("Disability Image is required when HasDisability is true.")
-                .Must(file =>
-                {
-                    if (file is null)
+                .Cascade(CascadeMode.Stop)
+                .Must((request, file) =>
                     {
-                        return false;
-                    }
+                        if (!request.HasDisability)
+                        {
+                            return true;
+                        }
 
-                    if (file.Length > 10 * 1024 * 1024)
-                    {
-                        return false;
-                    }
+                        if (file is null)
+                        {
+                            return false;
+                        }
 
-                    var validExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-                    var extension = Path.GetExtension(file.FileName);
+                        if (file.Length > 10 * 1024 * 1024)
+                        {
+                            return false;
+                        }
 
-                    return validExtensions.Contains(extension);
-                })
-                .WithMessage("Disability Image must be an image file with a valid extension (jpg, jpeg, png, gif) and less than or equal to 10MB.");
+                        var validExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                        var extension = Path.GetExtension(file.FileName);
+
+                        return validExtensions.Contains(extension);
+                    })
+                .WithMessage("Disability Image must be an image file with a valid extension (jpg, jpeg, png, gif) and less than or equal to 10MB.")
+                .When(u => u.HasDisability);
         }
     }
 
