@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Centers.API.Processes.Account;
+﻿namespace Centers.API.Processes.Account;
 public sealed class UserRegisterProcess
 {
     public sealed class Request : IRequest<Result<Response>>
@@ -49,6 +47,26 @@ public sealed class UserRegisterProcess
             //    .Matches("^\\+971\\s*(50|51|52|55|56|2|3|4|6|7|9)\\d{7}$")
             //    .WithMessage("Your phone number does not appear to be valid for UAE.")
             //    .NotEmpty();
+
+            // UAE phone number validation.
+            //RuleFor(r => r.PhoneNumber)
+            //    .NotEmpty()
+            //    .Must(p => p.StartsWith("+971"))
+            //    .WithMessage("Invalid phone number. The phone number should start with +971.")
+            //    .Matches(@"^\+9715[0-9]\d{7}$")
+            //    .WithMessage("Your phone number does not appear to be valid for UAE.");
+
+            // Egyptian Phone number validation will be removed.
+            RuleFor(r => r.PhoneNumber)
+                .NotEmpty()
+                .WithMessage("Phone number is required.")
+                .NotNull()
+                .WithMessage("Phone number is required.")
+                .Must(p => p != null && p.StartsWith("+2"))
+                .WithMessage("Invalid phone number. The phone number should start with +2.")
+                .WithMessage("Phone number is required.")
+                .Matches(@"^\+201[0125][0-9]{8}$")
+                .WithMessage("Your phone number does not appear to be valid for Egypt.");
 
             RuleFor(u => u.Email)
                 .EmailAddress()

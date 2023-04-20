@@ -9,26 +9,48 @@ public sealed class VerifyOtpByPhoneNumberProcess
 
     public sealed class Response
     {
-        public string Name { get; set; }
-        public string ImageUrl { get; set; }
-        public string Token { get; set; }
+        public string Message { get; set; }
+    }
+
+    public sealed class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+            // UAE Validation for phone number.
+            //RuleFor(r => r.PhoneNumber)
+            //    .NotEmpty()
+            //    .Must(p => p.StartsWith("+971"))
+            //    .WithMessage("Invalid phone number. The phone number should start with +971.")
+            //    .Matches(@"^\+9715[0-9]\d{7}$")
+            //    .WithMessage("Invalid phone number. The phone number should start with +971, followed by a valid phone number.");
+
+            RuleFor(r => r.PhoneNumber)
+                .NotEmpty()
+                .WithMessage("Phone number is required.")
+                .NotNull()
+                .WithMessage("Phone number is required.")
+                .Must(p => p != null && p.StartsWith("+2"))
+                .WithMessage("Invalid phone number. The phone number should start with +2.")
+                .WithMessage("Phone number is required.")
+                .Matches(@"^\+201[0125][0-9]{8}$")
+                .WithMessage("Your phone number does not appear to be valid for Egypt.");
+
+            RuleFor(r => r.Otp)
+                 .NotEmpty();
+        }
     }
 
     public sealed class Handler : IRequestHandler<Request, Result<Response>>
     {
         private readonly UserManager<UserEntity> _userManager;
-        private readonly ITokenService _tokenService;
         private readonly IOtpService _otpService;
 
         public Handler(
             UserManager<UserEntity> userManager,
-            ITokenService tokenService,
             IOtpService otpService)
         {
             _userManager = userManager ??
                 throw new ArgumentNullException(nameof(userManager));
-            _tokenService = tokenService ??
-                throw new ArgumentNullException(nameof(tokenService));
             _otpService = otpService ??
                 throw new ArgumentNullException(nameof(otpService));
         }
@@ -36,7 +58,8 @@ public sealed class VerifyOtpByPhoneNumberProcess
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
             var user = await _userManager.Users
-                .FirstOrDefaultAsync(p => p.PhoneNumber.Equals(request.PhoneNumber), cancellationToken);
+                .FirstOrDefaultAsync(p => p.PhoneNumber.Equals(request.PhoneNumber), 
+                    cancellationToken);
 
             if (user is null)
             {
@@ -52,19 +75,20 @@ public sealed class VerifyOtpByPhoneNumberProcess
             {
                 return Result<Response>.Failure(new List<string>
                 {
-                    "The OTP you entered is incorrect."
+                    "We're sorry, but the OTP you entered is either incorrect or has expired. Please try again with a new OTP."
                 });
             }
 
             var otpEntity = await _otpService.GetOtpByPhoneNumberAsync(request.PhoneNumber);
 
-            await _otpService.RemoveOtpByPhoneNumber(otpEntity);
+            await _otpService.RemoveOtp(otpEntity);
+
+            user.PhoneNumberConfirmed = true;
+            await _userManager.UpdateAsync(user);
 
             return Result<Response>.Success(new Response
             {
-                Name = $"{user.FirstName} {user.LastName}",
-                ImageUrl = null,
-                Token = await _tokenService.CreateTokenAsync(user)
+                Message = "Great news! Your phone number has been verified, and you can now log in with confidence."
             });
         }
 

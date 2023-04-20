@@ -11,6 +11,7 @@ public sealed class OtpService : IOtpService
         _secretKey = config.GetValue<string>("OtpSecretKey")!;
     }
 
+    // Will be replaced later on.
     public async Task<string> GenerateOtpAsync(
         int digits = 6,
         int timeInMinutes = 60)
@@ -27,7 +28,7 @@ public sealed class OtpService : IOtpService
                            o.Otp.Equals(otp));
     }
 
-    public async Task RemoveOtpByPhoneNumber(OtpEntity otp)
+    public async Task RemoveOtp(OtpEntity otp)
     {
         _context.Otps.Remove(otp);
         await _context.SaveChangesAsync();

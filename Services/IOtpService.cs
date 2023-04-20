@@ -5,5 +5,5 @@ public interface IOtpService
     Task<bool> ValidateOtpAsync(string phoneNumber, string otp);
     Task<OtpEntity> GetOtpByPhoneNumberAsync(string phoneNumber);
     Task StoreOtp(string phoneNumber, string otp);
-    Task RemoveOtpByPhoneNumber(OtpEntity otp);
+    Task RemoveOtp(OtpEntity otp);
 }
