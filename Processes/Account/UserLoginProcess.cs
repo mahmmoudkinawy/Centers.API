@@ -51,7 +51,7 @@ public sealed class UserLoginProcess
             {
                 return Result<Response>.Failure(new List<string>
                 {
-                    "Email or Password is invalid"
+                    "Invalid email address or password. Please check your credentials and try again."
                 });
             }
 
@@ -61,7 +61,15 @@ public sealed class UserLoginProcess
             {
                 return Result<Response>.Failure(new List<string>
                 {
-                    "Email or Password is invalid"
+                    "Invalid email address or password. Please check your credentials and try again."
+                });
+            }
+
+            if (!await _userManager.IsPhoneNumberConfirmedAsync(user))
+            {
+                return Result<Response>.Failure(new List<string>
+                {
+                    "Your phone number has not yet been verified. To continue, please confirm your phone number first."
                 });
             }
 

@@ -8,7 +8,7 @@ public static class IdentityServiceExtensions
         {
             opts.Password.RequireNonAlphanumeric = false;
             opts.SignIn.RequireConfirmedAccount = false;
-            opts.SignIn.RequireConfirmedPhoneNumber = false;
+            opts.SignIn.RequireConfirmedPhoneNumber = true;
         })
             .AddRoles<RoleEntity>()
             .AddRoleManager<RoleManager<RoleEntity>>()

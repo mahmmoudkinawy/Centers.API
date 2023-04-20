@@ -161,6 +161,14 @@ public sealed class UserRegisterProcess
 
             }
 
+            if (!await _userManager.IsPhoneNumberConfirmedAsync(user))
+            {
+                return Result<Response>.Failure(new List<string>
+                {
+                    "Your phone number has not yet been verified. To continue, please confirm your phone number first."
+                });
+            }
+
             return Result<Response>.Success(new Response
             {
                 Name = $"{user.FirstName} {user.LastName}",

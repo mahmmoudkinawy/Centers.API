@@ -65,7 +65,8 @@ public static class Seed
                 Email = "bob@test.com",
                 UserName = "bob@test.com",
                 Gender = "Male",
-                PhoneNumber = "01208534246"
+                PhoneNumber = "01208534246",
+                PhoneNumberConfirmed = true
             },
             new UserEntity
             {
@@ -75,7 +76,8 @@ public static class Seed
                 Email = "lisa@test.com",
                 UserName = "lisa@test.com",
                 Gender = "Female",
-                PhoneNumber = "01204595826"
+                PhoneNumber = "01204595826",
+                PhoneNumberConfirmed = true
             }
         };
 
@@ -93,12 +95,14 @@ public static class Seed
             Email = "superadmin@test.com",
             UserName = "superadmin@test.com",
             Gender = "Male",
-            PhoneNumber = "01208536213"
+            PhoneNumber = "01208536213",
+            PhoneNumberConfirmed = true
         };
 
         await userManager.CreateAsync(superAdminUser, "Pa$$w0rd");
         await userManager.AddToRolesAsync(superAdminUser, new[]
         {
+            // Will be modified later on.
             Constants.Roles.SuperAdmin,
             Constants.Roles.CenterAdmin,
             Constants.Roles.Reviewer,
@@ -114,7 +118,8 @@ public static class Seed
             Email = "admincenter@test.com",
             UserName = "admincenter@test.com",
             Gender = "Female",
-            PhoneNumber = "01208534241"
+            PhoneNumber = "01208534241",
+            PhoneNumberConfirmed = true
         };
 
         await userManager.CreateAsync(centerAdminUser, "Pa$$w0rd");
@@ -128,7 +133,8 @@ public static class Seed
             Email = "teacher@test.com",
             UserName = "teacher@test.com",
             Gender = "Male",
-            PhoneNumber = "01204595826"
+            PhoneNumber = "01204595826",
+            PhoneNumberConfirmed = true
         };
 
         await userManager.CreateAsync(teacherUser, "Pa$$w0rd");
@@ -142,7 +148,8 @@ public static class Seed
             Email = "reviewer@test.com",
             UserName = "reviewer@test.com",
             Gender = "Female",
-            PhoneNumber = "01104595826"
+            PhoneNumber = "01104595826",
+            PhoneNumberConfirmed = true
         };
 
         await userManager.CreateAsync(reviewerUser, "Pa$$w0rd");
