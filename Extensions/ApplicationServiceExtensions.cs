@@ -9,6 +9,10 @@ public static class ApplicationServiceExtensions
 
         services.AddScoped<IPhotoService, PhotoService>();
 
+        services.AddTransient<ISmsService, SmsService>();
+
+        services.Configure<TwilioSettings>(config.GetSection("TwilioSettings"));
+
         services.AddMediatR(_ => _.RegisterServicesFromAssemblyContaining<Program>());
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
