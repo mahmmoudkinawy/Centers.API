@@ -22,11 +22,9 @@ public sealed class OtpService : IOtpService
 
     public async Task<bool> ValidateOtpAsync(string phoneNumber, string otp)
     {
-        var totp = new Totp(Base32Encoding.ToBytes(_secretKey));
-
-        var verify = totp.VerifyTotp(otp, out _, VerificationWindow.RfcSpecifiedNetworkDelay);
-
-        return await Task.FromResult(verify);
+        return await _context.Otps
+            .AnyAsync(o => o.PhoneNumber.Equals(phoneNumber) &&
+                           o.Otp.Equals(otp));
     }
 
     public async Task RemoveOtpByPhoneNumber(OtpEntity otp)
@@ -49,4 +47,8 @@ public sealed class OtpService : IOtpService
         await _context.SaveChangesAsync();
     }
 
+    public async Task<OtpEntity> GetOtpByPhoneNumberAsync(string phoneNumber)
+    {
+        return await _context.Otps.FirstOrDefaultAsync(p => p.PhoneNumber.Equals(phoneNumber));
+    }
 }

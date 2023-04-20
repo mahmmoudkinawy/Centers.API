@@ -1,4 +1,6 @@
-﻿namespace Centers.API.Controllers;
+﻿using Centers.API.Processes.Otps;
+
+namespace Centers.API.Controllers;
 
 [Route("api/v{version:apiVersion}/account")]
 [ApiController]
@@ -124,5 +126,23 @@ public sealed class AccountController : ControllerBase
 
         return Ok(response.Value);
     }
+
+    [HttpPost("verify-otp")]
+    public async Task<IActionResult> VerifyOtp(
+        [FromBody] VerifyOtpByPhoneNumberProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
+
 
 }
