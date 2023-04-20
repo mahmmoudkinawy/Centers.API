@@ -6,6 +6,7 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
     public CentersDbContext(DbContextOptions<CentersDbContext> options) : base(options) { }
 
     public DbSet<DisabilityEntity> Disabilities { get; set; }
+    public DbSet<OtpEntity> Otps { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -22,6 +23,11 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .WithOne(d => d.Disability)
             .HasForeignKey<UserEntity>(u => u.DisabilityId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<OtpEntity>()
+            .HasIndex(o => o.PhoneNumber);
+
+        builder.ApplyUtcDateTimeConverter();
     }
 
 }

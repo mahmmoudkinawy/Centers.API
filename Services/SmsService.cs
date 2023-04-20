@@ -1,16 +1,12 @@
-﻿using Microsoft.Extensions.Options;
-using Twilio;
-using Twilio.Rest.Api.V2010.Account;
-
-namespace Centers.API.Services;
-
-public class SmsService : ISmsService
+﻿namespace Centers.API.Services;
+public sealed class SmsService : ISmsService
 {
     private readonly TwilioSettings _twilioSettings;
 
     public SmsService(IOptions<TwilioSettings> twilioSettings)
     {
-        _twilioSettings = twilioSettings.Value;
+        _twilioSettings = twilioSettings.Value ??
+            throw new ArgumentNullException(nameof(twilioSettings));
     }
 
     public async Task<MessageResource> SendSmsAsync(string to, string message)

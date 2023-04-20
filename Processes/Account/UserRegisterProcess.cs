@@ -7,6 +7,7 @@ public sealed class UserRegisterProcess
         public string? LastName { get; set; }
         public string? Gender { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? NationalId { get; set; }
         public string? Email { get; set; }
         public string? Password { get; set; }
 
@@ -39,8 +40,15 @@ public sealed class UserRegisterProcess
                 .NotEmpty();
 
             RuleFor(u => u.PhoneNumber)
-                .Matches("^\\+971(\\s*|\\-)(50|51|52|55|56|2|3|4|6|7|9)\\d{7}$")
-                .WithMessage("Your phone number does not appear to be valid for UAE.")
+                //.Matches("^\\+971\\s*(50|51|52|55|56|2|3|4|6|7|9)\\d{7}$")
+                //.WithMessage("Your phone number does not appear to be valid for UAE.")
+                //.Matches("/^01[0125][0-9]{8}$/")
+                //.WithMessage("Your phone number does not appear to be valid for Egypt.")
+                .NotEmpty();
+
+            RuleFor(u => u.NationalId)
+                //.Matches("/^784-[0-9]{4}-[0-9]{7}-[0-9]{1}$/")
+                //.WithMessage("Your National Id does not appear to be valid for UAE.")
                 .NotEmpty();
 
             RuleFor(u => u.Email)
@@ -98,12 +106,16 @@ public sealed class UserRegisterProcess
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
+        private readonly IOtpService _otpService;
+        private readonly ISmsService _smsService;
 
         public Handler(
             UserManager<UserEntity> userManager,
             IServiceScopeFactory serviceScopeFactory,
             ITokenService tokenService,
-            IMapper mapper)
+            IMapper mapper,
+            IOtpService otpService,
+            ISmsService smsService)
         {
             _userManager = userManager ??
                 throw new ArgumentNullException(nameof(userManager));
@@ -113,11 +125,24 @@ public sealed class UserRegisterProcess
                 throw new ArgumentNullException(nameof(tokenService));
             _mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
+            _otpService = otpService ??
+                throw new ArgumentNullException(nameof(otpService));
+            _smsService = smsService ??
+                throw new ArgumentNullException(nameof(smsService));
         }
 
         public async Task<Result<Response>> Handle(
             Request request, CancellationToken cancellationToken)
         {
+            if (await _userManager.Users
+                .AnyAsync(p => p.PhoneNumber.Equals(request.PhoneNumber), cancellationToken))
+            {
+                return Result<Response>.Failure(new List<string>
+                {
+                    "The phone number you've chosen is currently associated with another account and has already been verified."
+                });
+            }
+
             var user = _mapper.Map<UserEntity>(request);
 
             var result = await _userManager.CreateAsync(user, request.Password);
@@ -163,11 +188,25 @@ public sealed class UserRegisterProcess
 
             if (!await _userManager.IsPhoneNumberConfirmedAsync(user))
             {
-                return Result<Response>.Failure(new List<string>
+                var otp = await _otpService.GenerateOtpAsync(6);
+
+                await _otpService.StoreOtp(request.PhoneNumber, otp);
+
+                var sendSms = await _smsService
+                    .SendSmsAsync(
+                        $"+2{request.PhoneNumber}",
+                        $"Thank you for registering! To verify your account, please enter the following OTP code: {otp}.");
+
+                if (!string.IsNullOrWhiteSpace(sendSms.ErrorMessage))
                 {
-                    "Your phone number has not yet been verified. To continue, please confirm your phone number first."
-                });
+                    return Result<Response>.Failure(new List<string>
+                    {
+                        sendSms.ErrorMessage
+                    });
+                }
             }
+
+            await _userManager.AddToRoleAsync(user, Constants.Roles.Student);
 
             return Result<Response>.Success(new Response
             {

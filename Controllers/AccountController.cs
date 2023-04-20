@@ -77,7 +77,7 @@ public sealed class AccountController : ControllerBase
     ///     --boundary
     ///     Content-Disposition: form-data; name="phoneNumber"
     ///
-    ///     +971-501234567
+    ///     +971501234567
     ///     --boundary
     ///     Content-Disposition: form-data; name="email"
     ///
@@ -94,6 +94,10 @@ public sealed class AccountController : ControllerBase
     ///     Content-Disposition: form-data; name="disability"; filename="myDisability.jpg"
     ///     Content-Type: image/jpeg
     ///
+    ///     --boundary
+    ///     Content-Disposition: form-data; name="NationalId";
+    ///     
+    ///     784-011020-1234-567
     ///     [binary data]
     ///     --boundary--
     ///

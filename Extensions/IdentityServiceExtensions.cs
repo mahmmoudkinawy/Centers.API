@@ -2,7 +2,8 @@
 public static class IdentityServiceExtensions
 {
     public static IServiceCollection AddIdentityServices(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        IConfiguration config)
     {
         services.AddIdentityCore<UserEntity>(opts =>
         {
@@ -15,7 +16,20 @@ public static class IdentityServiceExtensions
             .AddSignInManager<SignInManager<UserEntity>>()
             .AddEntityFrameworkStores<CentersDbContext>();
 
-        services.AddAuthentication();
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(opts =>
+                    {
+                        opts.TokenValidationParameters = new()
+                        {
+                            ValidateAudience = false,
+                            ValidateIssuer = false,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(config[Constants.TokenKey]!)),
+                            ClockSkew = TimeSpan.Zero
+                        };
+                    });
 
         services.AddAuthorization(builder =>
         {

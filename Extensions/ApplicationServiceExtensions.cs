@@ -13,6 +13,8 @@ public static class ApplicationServiceExtensions
 
         services.Configure<TwilioSettings>(config.GetSection("TwilioSettings"));
 
+        services.AddScoped<IOtpService, OtpService>();
+
         services.AddMediatR(_ => _.RegisterServicesFromAssemblyContaining<Program>());
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

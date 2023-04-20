@@ -8,10 +8,12 @@ namespace Centers.API.Controllers;
 public class SmsController : ControllerBase
 {
     private readonly ISmsService _smsService;
+    private readonly IOtpService _otpService;
 
-    public SmsController(ISmsService smsService)
+    public SmsController(ISmsService smsService, IOtpService otpService)
     {
         _smsService = smsService;
+        _otpService = otpService;
     }
 
     [HttpPost]
@@ -24,6 +26,10 @@ public class SmsController : ControllerBase
         {
             return BadRequest(result.ErrorMessage);
         }
+
+        var d = await _otpService.GenerateOtpAsync();
+
+        //var va = _otpService.ValidateOtpAsync(d);
 
         return Ok(result);
     }
