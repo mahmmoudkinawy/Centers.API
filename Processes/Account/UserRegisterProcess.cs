@@ -1,4 +1,6 @@
-﻿namespace Centers.API.Processes.Account;
+﻿using System.Text.RegularExpressions;
+
+namespace Centers.API.Processes.Account;
 public sealed class UserRegisterProcess
 {
     public sealed class Request : IRequest<Result<Response>>
@@ -17,9 +19,8 @@ public sealed class UserRegisterProcess
 
     public sealed class Response
     {
-        public string Name { get; set; }
-        public string ImageUrl { get; set; }
-        public string Token { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Message { get; set; }
     }
 
     public sealed class Validator : AbstractValidator<Request>
@@ -39,17 +40,15 @@ public sealed class UserRegisterProcess
             RuleFor(u => u.Gender)
                 .NotEmpty();
 
-            RuleFor(u => u.PhoneNumber)
-                //.Matches("^\\+971\\s*(50|51|52|55|56|2|3|4|6|7|9)\\d{7}$")
-                //.WithMessage("Your phone number does not appear to be valid for UAE.")
-                //.Matches("/^01[0125][0-9]{8}$/")
-                //.WithMessage("Your phone number does not appear to be valid for Egypt.")
+            RuleFor(u => u.NationalId)
+                .Matches("^784-(19|20)\\d{2}-\\d{7}-\\d{1}$")
+                .WithMessage("Your National Id does not appear to be valid for UAE.")
                 .NotEmpty();
 
-            RuleFor(u => u.NationalId)
-                //.Matches("/^784-[0-9]{4}-[0-9]{7}-[0-9]{1}$/")
-                //.WithMessage("Your National Id does not appear to be valid for UAE.")
-                .NotEmpty();
+            //RuleFor(u => u.PhoneNumber)
+            //    .Matches("^\\+971\\s*(50|51|52|55|56|2|3|4|6|7|9)\\d{7}$")
+            //    .WithMessage("Your phone number does not appear to be valid for UAE.")
+            //    .NotEmpty();
 
             RuleFor(u => u.Email)
                 .EmailAddress()
@@ -149,13 +148,7 @@ public sealed class UserRegisterProcess
 
             if (!result.Succeeded)
             {
-                var errors = new List<string>();
-                foreach (var error in result.Errors)
-                {
-                    errors.Add(error.Description);
-                }
-
-                return Result<Response>.Failure(errors);
+                return Result<Response>.Failure(result.Errors.Select(e => e.Description).ToList());
             }
 
             if (request.HasDisability && request.DisabilityImage is not null)
@@ -183,8 +176,9 @@ public sealed class UserRegisterProcess
                     };
                 }, cancellationToken);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-
             }
+
+            await _userManager.AddToRoleAsync(user, Constants.Roles.Student);
 
             if (!await _userManager.IsPhoneNumberConfirmedAsync(user))
             {
@@ -194,7 +188,7 @@ public sealed class UserRegisterProcess
 
                 var sendSms = await _smsService
                     .SendSmsAsync(
-                        $"+2{request.PhoneNumber}",
+                        $"{request.PhoneNumber}",
                         $"Thank you for registering! To verify your account, please enter the following OTP code: {otp}.");
 
                 if (!string.IsNullOrWhiteSpace(sendSms.ErrorMessage))
@@ -204,15 +198,17 @@ public sealed class UserRegisterProcess
                         sendSms.ErrorMessage
                     });
                 }
+
+                return Result<Response>.Success(new Response
+                {
+                    PhoneNumber = request.PhoneNumber,
+                    Message = "Please enter the OTP code sent to your phone to complete registration."
+                });
             }
 
-            await _userManager.AddToRoleAsync(user, Constants.Roles.Student);
-
-            return Result<Response>.Success(new Response
+            return Result<Response>.Failure(new List<string>
             {
-                Name = $"{user.FirstName} {user.LastName}",
-                ImageUrl = null,
-                Token = await _tokenService.CreateTokenAsync(user)
+                "Something went wrong."
             });
         }
 

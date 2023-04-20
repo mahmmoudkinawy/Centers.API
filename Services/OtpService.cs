@@ -26,16 +26,13 @@ public sealed class OtpService : IOtpService
 
         var verify = totp.VerifyTotp(otp, out _, VerificationWindow.RfcSpecifiedNetworkDelay);
 
-        if (verify)
-        {
-            var otpEntity = await _context.Otps.FirstOrDefaultAsync(o => o.PhoneNumber.Equals(phoneNumber));
-            _context.Otps.Remove(otpEntity);
-            await _context.SaveChangesAsync();
-
-            return await Task.FromResult(verify);
-        }
-
         return await Task.FromResult(verify);
+    }
+
+    public async Task RemoveOtpByPhoneNumber(OtpEntity otp)
+    {
+        _context.Otps.Remove(otp);
+        await _context.SaveChangesAsync();
     }
 
     public async Task StoreOtp(string phoneNumber, string otp)
