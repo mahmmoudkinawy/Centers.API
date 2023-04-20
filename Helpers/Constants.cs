@@ -6,6 +6,11 @@ public static class Constants
     public const string CorsPolicyName = "default";
     public const string CorsOriginSectionKey = "CrossOriginRequests:AllowedOrigins";
 
+    public sealed class Policies
+    {
+        public const string MustBeSuperAdmin = "MustBeSuperAdmin";
+    }
+
     public sealed class CloudinarySettings
     {
         public const string CloudName = "CloudinarySettings:CloudName";

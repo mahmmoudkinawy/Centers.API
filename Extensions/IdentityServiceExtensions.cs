@@ -36,6 +36,12 @@ public static class IdentityServiceExtensions
             builder.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
+
+            builder.AddPolicy(Constants.Policies.MustBeSuperAdmin, opts =>
+            {
+                opts.RequireClaim(ClaimTypes.Role, Constants.Roles.SuperAdmin);
+            });
+
         });
 
         return services;

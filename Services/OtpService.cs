@@ -52,4 +52,16 @@ public sealed class OtpService : IOtpService
     {
         return await _context.Otps.FirstOrDefaultAsync(p => p.PhoneNumber.Equals(phoneNumber));
     }
+
+    public async Task<IReadOnlyList<OtpEntity>> GetOtpsByPhoneNumberAsync(string phoneNumber)
+    {
+        return await _context.Otps.Where(p => p.PhoneNumber.Equals(phoneNumber)).ToListAsync();
+    }
+
+    public async Task RemoveOtps(IEnumerable<OtpEntity> opts)
+    {
+        _context.Otps.RemoveRange(opts);
+        await _context.SaveChangesAsync();
+    }
+
 }

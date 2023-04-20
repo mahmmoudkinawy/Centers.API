@@ -5,6 +5,7 @@ global using Centers.API.Extensions;
 global using Centers.API.Helpers;
 global using Centers.API.Processes.Account;
 global using Centers.API.Processes.Otps;
+global using Centers.API.Processes.Users;
 global using Centers.API.Services;
 global using CloudinaryDotNet;
 global using CloudinaryDotNet.Actions;

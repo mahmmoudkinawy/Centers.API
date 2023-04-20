@@ -165,4 +165,42 @@ public sealed class AccountController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Create Otp endpoint to send an the otp.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns if the operations is successful or not.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /send-otp
+    ///     {
+    ///        "phoneNumber":"+201208534244"
+    ///     }
+    /// </remarks>
+    /// <response code="200">Returns if the operations is successful or not.</response>
+    /// <response code="400">Validation errors.</response>
+    /// <response code="401">User does not exist.</response>
+    [HttpPost("send-otp")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SendOtp(
+        [FromBody] SendOtpToConfirmPhoneNumberProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
+
+
 }

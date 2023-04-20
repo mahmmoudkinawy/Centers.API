@@ -121,7 +121,6 @@ public sealed class UserRegisterProcess
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
         private readonly IOtpService _otpService;
         private readonly ISmsService _smsService;
@@ -129,7 +128,6 @@ public sealed class UserRegisterProcess
         public Handler(
             UserManager<UserEntity> userManager,
             IServiceScopeFactory serviceScopeFactory,
-            ITokenService tokenService,
             IMapper mapper,
             IOtpService otpService,
             ISmsService smsService)
@@ -137,9 +135,7 @@ public sealed class UserRegisterProcess
             _userManager = userManager ??
                 throw new ArgumentNullException(nameof(userManager));
             _serviceScopeFactory = serviceScopeFactory ??
-                throw new ArgumentNullException(nameof(userManager));
-            _tokenService = tokenService ??
-                throw new ArgumentNullException(nameof(tokenService));
+                throw new ArgumentNullException(nameof(serviceScopeFactory));
             _mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
             _otpService = otpService ??
