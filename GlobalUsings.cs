@@ -1,4 +1,5 @@
 ﻿global using AutoMapper;
+global using AutoMapper.QueryableExtensions;
 global using Centers.API.DbContexts;
 global using Centers.API.Entities;
 global using Centers.API.Extensions;
@@ -31,3 +32,4 @@ global using System.Security.Claims;
 global using System.Text;
 global using Twilio;
 global using Twilio.Rest.Api.V2010.Account;
+
