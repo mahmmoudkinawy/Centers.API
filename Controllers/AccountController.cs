@@ -1,6 +1,4 @@
-﻿using Centers.API.Processes.Otps;
-
-namespace Centers.API.Controllers;
+﻿namespace Centers.API.Controllers;
 
 [Route("api/v{version:apiVersion}/account")]
 [ApiController]
@@ -99,7 +97,7 @@ public sealed class AccountController : ControllerBase
     ///     --boundary
     ///     Content-Disposition: form-data; name="NationalId";
     ///     
-    ///     784-011020-1234-567
+    ///     784-1997-1234567-8
     ///     [binary data]
     ///     --boundary--
     ///
@@ -127,7 +125,29 @@ public sealed class AccountController : ControllerBase
         return Ok(response.Value);
     }
 
+
+    /// <summary>
+    /// Verify Otp endpoint to verify the otp.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns if the operations is successful or not.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     POST /verify-otp
+    ///     {
+    ///        "phoneNumber":"+201208534244",
+    ///        "otpCode":"Pa$$w0rd"
+    ///     }
+    /// </remarks>
+    /// <response code="200">Returns if the operations is successful or not.</response>
+    /// <response code="400">Validation errors.</response>
+    /// <response code="401">User does not exist.</response>
     [HttpPost("verify-otp")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> VerifyOtp(
         [FromBody] VerifyOtpByPhoneNumberProcess.Request request,
         CancellationToken cancellationToken)

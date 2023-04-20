@@ -4,7 +4,7 @@ public sealed class VerifyOtpByPhoneNumberProcess
     public sealed class Request : IRequest<Result<Response>>
     {
         public string? PhoneNumber { get; set; }
-        public string? Otp { get; set; }
+        public string? OtpCode { get; set; }
     }
 
     public sealed class Response
@@ -35,7 +35,8 @@ public sealed class VerifyOtpByPhoneNumberProcess
                 .Matches(@"^\+201[0125][0-9]{8}$")
                 .WithMessage("Your phone number does not appear to be valid for Egypt.");
 
-            RuleFor(r => r.Otp)
+            RuleFor(r => r.OtpCode)
+                 .NotNull()
                  .NotEmpty();
         }
     }
@@ -69,7 +70,7 @@ public sealed class VerifyOtpByPhoneNumberProcess
                 });
             }
 
-            var isValidOtp = await _otpService.ValidateOtpAsync(request.PhoneNumber, request.Otp);
+            var isValidOtp = await _otpService.ValidateOtpAsync(request.PhoneNumber, request.OtpCode);
 
             if (!isValidOtp)
             {
