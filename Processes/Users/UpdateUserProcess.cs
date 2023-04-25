@@ -110,11 +110,18 @@ public sealed class UpdateUserProcess
 
             var userToUpdateId = Guid.Parse(userIdFromRoute.ToString());
 
+            var currentUserId = _httpContextAccessor.HttpContext?.User?.GetUserById();
+
             var user = await _userManager.FindByIdAsync(userToUpdateId.ToString());
 
             if (user is null)
             {
                 return Result<Response>.Failure(new List<string> { "We're sorry, but we could not find a user with the provided id." });
+            }
+
+            if (user.Id == currentUserId)
+            {
+                return Result<Response>.Failure(new List<string> { "As the admin, you are not authorized to update your personal data from here." });
             }
 
             _mapper.Map(request, user);

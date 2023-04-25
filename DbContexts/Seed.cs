@@ -164,6 +164,7 @@ public static class Seed
             .RuleFor(u => u.UserName, f => f.Person.UserName)
             .RuleFor(u => u.PhoneNumber, f => f.Person.Phone)
             .RuleFor(u => u.PhoneNumberConfirmed, f => true)
+            .RuleFor(u => u.NationalId, f => f.Person.Random.AlphaNumeric(15))
             .RuleFor(u => u.Gender, f => (new[] { "Female", "Male" })[new Random().Next(2)]);
 
         foreach (var student in fakeStudents.GenerateBetween(100, 150))
