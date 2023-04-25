@@ -134,7 +134,7 @@ public sealed class UpdateUserProcess
 
             _mapper.Map(request, user);
 
-            var updateResult = await _userManager.UpdateAsync(user); //this line gives me a lot error as is part of a key and so cannot be modified or marked as modified. To change the principal of an existing entity with an identifying foreign key, first delete the dependent and invoke 'SaveChanges', and then associate the dependent with the new principal.
+            var updateResult = await _userManager.UpdateAsync(user);
 
             if (!updateResult.Succeeded)
             {

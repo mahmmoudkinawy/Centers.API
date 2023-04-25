@@ -113,6 +113,31 @@ public sealed class UsersController : ControllerBase
         return Ok(response.Value);
     }
 
+    /// <summary>
+    /// Updated a user with the role.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns if the whole operation succeed or not.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     PUT /users/298b38ca-2325-b88a-43ee-0371425a26ce
+    ///     {
+    ///         "firstName": "Sameh updated",
+    ///         "lastName": "Yossry updated",
+    ///         "gender": "Male",
+    ///         "phoneNumber": "+201208534246",
+    ///         "nationalId": "789-1234-5678901-2",
+    ///         "email": "sameh.yossry@test.com",
+    ///         "password": "Pa$$w0rd",
+    ///         "isPhoneNumberConfirmed": true,
+    ///         "role": "Student"
+    ///     }
+    /// </remarks>
+    /// <response code="200">Returns if the whole operation succeed or not.</response>
+    /// <response code="401">Validation errors.</response>
+    /// <response code="401">User does not exist.</response>
     [HttpPut("{userId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

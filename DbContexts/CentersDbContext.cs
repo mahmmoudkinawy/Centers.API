@@ -7,6 +7,7 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
 
     public DbSet<DisabilityEntity> Disabilities { get; set; }
     public DbSet<OtpEntity> Otps { get; set; }
+    public DbSet<SubjectEntity> Subjects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
