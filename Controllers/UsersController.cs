@@ -47,11 +47,23 @@ public sealed class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetUsers(
+        [FromQuery] UserParams userParams,
         CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
-            new GetUsersProcess.Request { },
+            new GetUsersProcess.Request
+            {
+                Keyword = userParams.Keyword,
+                PageNumber = userParams.PageNumber,
+                PageSize = userParams.PageSize
+            },
             cancellationToken);
+
+        Response.AddPaginationHeader(
+            response.CurrentPage,
+            response.PageSize,
+            response.TotalPages,
+            response.TotalCount);
 
         return Ok(response);
     }

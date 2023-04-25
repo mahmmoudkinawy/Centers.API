@@ -1,9 +1,13 @@
 ﻿namespace Centers.API.Processes.Users;
 public sealed class GetUsersProcess
 {
-    public sealed class Request : IRequest<IReadOnlyList<Response>>
+    public sealed class Request : IRequest<PagedList<Response>>
     {
         // will include users, pagination, searching, ordering .... etc.
+
+        public string? Keyword { get; set; }
+        public int PageNumber { get; set; }
+        public int PageSize { get; set; }
     }
 
     public sealed class Response
@@ -25,7 +29,7 @@ public sealed class GetUsersProcess
         }
     }
 
-    public sealed class Handler : IRequestHandler<Request, IReadOnlyList<Response>>
+    public sealed class Handler : IRequestHandler<Request, PagedList<Response>>
     {
         private readonly UserManager<UserEntity> _userManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -44,15 +48,31 @@ public sealed class GetUsersProcess
                 throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
-        public async Task<IReadOnlyList<Response>> Handle(Request request, CancellationToken cancellationToken)
+        public async Task<PagedList<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
             var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
 
             var query = _userManager.Users.Where(u => u.Id != currentUserId).AsQueryable();
 
-            var users = await query.ProjectTo<Response>(_mapper.ConfigurationProvider).ToListAsync();
+            if (!string.IsNullOrWhiteSpace(request.Keyword))
+            {
+                // Must trim the keyword and must make the following code more good and productive.
+                // But will do that later.
 
-            return users;
+                var keyword = request.Keyword;
+                query = query.Where(u =>
+                    u.FirstName.Contains(keyword) ||
+                    u.LastName.Contains(keyword) ||
+                    u.Email.Contains(keyword) ||
+                    u.PhoneNumber.Contains(keyword) ||
+                    u.Gender.Contains(keyword) ||
+                    u.NationalId.Contains(keyword));
+            }
+
+            return await PagedList<Response>
+                .CreateAsync(query.ProjectTo<Response>(_mapper.ConfigurationProvider),
+                 request.PageNumber,
+                 request.PageSize);
         }
 
     }

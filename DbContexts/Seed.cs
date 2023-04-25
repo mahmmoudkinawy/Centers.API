@@ -155,6 +155,23 @@ public static class Seed
         await userManager.CreateAsync(reviewerUser, "Pa$$w0rd");
         await userManager.AddToRoleAsync(reviewerUser, Constants.Roles.Reviewer);
 
+        // Seeding some fake users for testing.
+        var fakeStudents = new Faker<UserEntity>()
+            .RuleFor(u => u.Id, f => f.Random.Guid())
+            .RuleFor(u => u.FirstName, f => f.Person.FirstName)
+            .RuleFor(u => u.LastName, f => f.Person.LastName)
+            .RuleFor(u => u.Email, f => f.Person.Email)
+            .RuleFor(u => u.UserName, f => f.Person.UserName)
+            .RuleFor(u => u.PhoneNumber, f => f.Person.Phone)
+            .RuleFor(u => u.PhoneNumberConfirmed, f => true)
+            .RuleFor(u => u.Gender, f => (new[] { "Female", "Male" })[new Random().Next(2)]);
+
+        foreach (var student in fakeStudents.GenerateBetween(100, 150))
+        {
+            await userManager.CreateAsync(student, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(student, Constants.Roles.Student);
+        }
+
     }
 
 }
