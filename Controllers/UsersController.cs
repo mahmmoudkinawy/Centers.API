@@ -113,6 +113,26 @@ public sealed class UsersController : ControllerBase
         return Ok(response.Value);
     }
 
+    [HttpPut("{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateUser(
+        [FromBody] UpdateUserProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
+
     /// <summary>
     /// Remove some user with the given ID.
     /// </summary>
