@@ -9,7 +9,6 @@ public sealed class UpdateUserProcess
         public string? PhoneNumber { get; set; }
         public string? NationalId { get; set; }
         public string? Email { get; set; }
-        public string? Password { get; set; }
         public bool? IsPhoneNumberConfirmed { get; set; } = false;
         public string? Role { get; set; }
     }
@@ -65,7 +64,9 @@ public sealed class UpdateUserProcess
                 .EmailAddress()
                 .NotEmpty();
 
-            RuleFor(u => u.Password)
+            RuleFor(u => u.NationalId)
+                .Matches("^784-(19|20)\\d{2}-\\d{7}-\\d{1}$")
+                .WithMessage("Your National Id does not appear to be valid for UAE.")
                 .NotEmpty();
 
             RuleFor(u => u.Role)
@@ -77,9 +78,7 @@ public sealed class UpdateUserProcess
     {
         public Mapper()
         {
-            CreateMap<Request, UserEntity>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(u => Guid.NewGuid()))
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(r => r.Email));
+            CreateMap<Request, UserEntity>();
         }
     }
 
@@ -112,6 +111,20 @@ public sealed class UpdateUserProcess
 
             var currentUserId = _httpContextAccessor.HttpContext?.User?.GetUserById();
 
+            if (userToUpdateId == currentUserId)
+            {
+                return Result<Response>.Failure(new List<string> { "As the admin, you are not authorized to update your personal data from here." });
+            }
+
+            if (await _userManager.Users
+               .AnyAsync(p => p.PhoneNumber.Equals(request.PhoneNumber), cancellationToken))
+            {
+                return Result<Response>.Failure(new List<string>
+                {
+                    "The phone number you've chosen is currently associated with another account and has already been verified."
+                });
+            }
+
             var user = await _userManager.FindByIdAsync(userToUpdateId.ToString());
 
             if (user is null)
@@ -119,14 +132,9 @@ public sealed class UpdateUserProcess
                 return Result<Response>.Failure(new List<string> { "We're sorry, but we could not find a user with the provided id." });
             }
 
-            if (user.Id == currentUserId)
-            {
-                return Result<Response>.Failure(new List<string> { "As the admin, you are not authorized to update your personal data from here." });
-            }
-
             _mapper.Map(request, user);
 
-            var updateResult = await _userManager.UpdateAsync(user);
+            var updateResult = await _userManager.UpdateAsync(user); //this line gives me a lot error as is part of a key and so cannot be modified or marked as modified. To change the principal of an existing entity with an identifying foreign key, first delete the dependent and invoke 'SaveChanges', and then associate the dependent with the new principal.
 
             if (!updateResult.Succeeded)
             {
@@ -135,10 +143,11 @@ public sealed class UpdateUserProcess
 
             var roles = new List<string>()
             {
+                // Admin can not add admin till now.
+                Constants.Roles.Student,
                 Constants.Roles.Reviewer,
                 Constants.Roles.Teacher,
-                Constants.Roles.CenterAdmin,
-                Constants.Roles.SuperAdmin
+                Constants.Roles.CenterAdmin
             };
 
             var currentRoles = await _userManager.GetRolesAsync(user);

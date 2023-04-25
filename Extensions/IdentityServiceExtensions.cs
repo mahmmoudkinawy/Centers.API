@@ -8,6 +8,7 @@ public static class IdentityServiceExtensions
         services.AddIdentityCore<UserEntity>(opts =>
         {
             opts.Password.RequireNonAlphanumeric = false;
+            opts.User.RequireUniqueEmail = true;
             opts.SignIn.RequireConfirmedAccount = false;
             opts.SignIn.RequireConfirmedPhoneNumber = true;
         })
