@@ -59,7 +59,9 @@ public sealed class CetShiftsProcess
 
         public async Task<PagedList<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var shift = _context.Shifts.AsQueryable();
+            var shift = _context.Shifts
+                .OrderBy(s => s.Id)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(request.Keyword))
             {

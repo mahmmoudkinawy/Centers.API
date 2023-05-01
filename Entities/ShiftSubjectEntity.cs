@@ -1,6 +1,4 @@
 ﻿namespace Centers.API.Entities;
-
-[Table("ShiftSubjects")]
 public sealed class ShiftSubjectEntity
 {
     public Guid Id { get; set; }

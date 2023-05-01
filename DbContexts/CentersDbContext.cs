@@ -11,6 +11,7 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
     public DbSet<CenterEntity> Centers { get; set; }
     public DbSet<ImageEntity> Images { get; set; }
     public DbSet<ShiftEntity> Shifts { get; set; }
+    public DbSet<ShiftSubjectEntity> ShiftSubjects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

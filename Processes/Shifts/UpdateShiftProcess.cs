@@ -107,12 +107,33 @@ public sealed class UpdateShiftProcess
             var shiftId = Guid.Parse(shiftIdFromRoute.ToString());
 
             var shift = await _context.Shifts
+                .Include(s => s.ShiftSubjects)
                 .FirstOrDefaultAsync(s => s.Id == shiftId, cancellationToken: cancellationToken);
 
             if (shift is null)
             {
                 return Result<Response>.Failure(
                     new List<string> { "We're sorry, but the shift with the given ID does not exist. Please check the ID and try again." });
+            }
+
+            foreach (var subjectId in request.SubjectIds)
+            {
+                var existingShiftSubject = shift.ShiftSubjects.FirstOrDefault(s => s.SubjectId == subjectId);
+                if (existingShiftSubject is not null)
+                {
+                    _context.ShiftSubjects.Update(existingShiftSubject);
+                }
+                else
+                {
+                    var shiftSubject = new ShiftSubjectEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        ShiftId = shift.Id,
+                        SubjectId = subjectId
+                    };
+
+                    _context.ShiftSubjects.Add(shiftSubject);
+                }
             }
 
             _mapper.Map(request, shift);
