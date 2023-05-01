@@ -45,7 +45,9 @@ public sealed class UserLoginProcess
         public async Task<Result<Response>> Handle(
             Request request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var user = await _userManager.Users
+                .Include(u => u.Images)
+                .FirstOrDefaultAsync(u => u.Email.Equals(request.Email), cancellationToken: cancellationToken);
 
             if (user is null)
             {
@@ -76,7 +78,7 @@ public sealed class UserLoginProcess
             return Result<Response>.Success(new Response
             {
                 Name = $"{user.FirstName} {user.LastName}",
-                ImageUrl = null,
+                ImageUrl = user.Images.MaxBy(i => i.CreatedAt)?.ImageUrl ?? null,
                 Token = await _tokenService.CreateTokenAsync(user)
             });
         }

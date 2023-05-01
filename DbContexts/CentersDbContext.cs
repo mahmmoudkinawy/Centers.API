@@ -9,6 +9,7 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
     public DbSet<OtpEntity> Otps { get; set; }
     public DbSet<SubjectEntity> Subjects { get; set; }
     public DbSet<CenterEntity> Centers { get; set; }
+    public DbSet<ImageEntity> Images { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -28,6 +29,12 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
 
         builder.Entity<OtpEntity>()
             .HasIndex(o => o.PhoneNumber);
+
+        builder.Entity<UserEntity>()
+            .HasMany(i => i.Images)
+            .WithOne(u => u.User)
+            .HasForeignKey(ui => ui.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ApplyUtcDateTimeConverter();
     }

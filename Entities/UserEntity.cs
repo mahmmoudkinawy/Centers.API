@@ -1,5 +1,4 @@
 ﻿namespace Centers.API.Entities;
-
 public sealed class UserEntity : IdentityUser<Guid>
 {
     public string? FirstName { get; set; }
@@ -9,4 +8,6 @@ public sealed class UserEntity : IdentityUser<Guid>
 
     public Guid? DisabilityId { get; set; }
     public DisabilityEntity? Disability { get; set; }
+
+    public ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
 }
