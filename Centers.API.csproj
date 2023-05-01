@@ -36,4 +36,8 @@
 		<PackageReference Include="Twilio" Version="6.5.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Processes\Shifts\" />
+	</ItemGroup>
+
 </Project>

@@ -8,5 +8,7 @@ public sealed class CenterEntity
     public DateTime? OpeningDate { get; set; }
     public DateTime? ClosingDate { get; set; }
 
+    public ICollection<ShiftEntity> Shifts { get; set; } = new List<ShiftEntity>();
+
     // need to add more properties such Employees, Students, Subjects, Owner of this center .... etc
 }

@@ -10,6 +10,7 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
     public DbSet<SubjectEntity> Subjects { get; set; }
     public DbSet<CenterEntity> Centers { get; set; }
     public DbSet<ImageEntity> Images { get; set; }
+    public DbSet<ShiftEntity> Shifts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -35,6 +36,31 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .WithOne(u => u.User)
             .HasForeignKey(ui => ui.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ShiftEntity>()
+            .HasOne(c => c.Center)
+            .WithMany(s => s.Shifts)
+            .HasForeignKey(k => k.CenterId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ShiftEntity>()
+            .HasOne(a => a.Admin)
+            .WithMany()
+            .HasForeignKey(k => k.AdminId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<ShiftSubjectEntity>()
+            .HasKey(ss => new { ss.ShiftId, ss.SubjectId });
+
+        builder.Entity<ShiftSubjectEntity>()
+            .HasOne(ss => ss.Shift)
+            .WithMany(s => s.ShiftSubjects)
+            .HasForeignKey(ss => ss.ShiftId);
+
+        builder.Entity<ShiftSubjectEntity>()
+            .HasOne(ss => ss.Subject)
+            .WithMany()
+            .HasForeignKey(ss => ss.SubjectId);
 
         builder.ApplyUtcDateTimeConverter();
     }

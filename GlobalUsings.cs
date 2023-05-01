@@ -30,6 +30,7 @@ global using Microsoft.Extensions.Options;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
 global using OtpNet;
+global using System.ComponentModel.DataAnnotations.Schema;
 global using System.IdentityModel.Tokens.Jwt;
 global using System.Reflection;
 global using System.Security.Claims;
