@@ -78,7 +78,7 @@ public sealed class UpdateSubjectProcess
             }
 
             return Result<Response>.Failure(
-                new List<string> { "We're sorry, but there was an error saving the subject to the database. Please try again later." });
+                new List<string> { "We're sorry, but there was an error updating the subject to the database. Please try again later." });
         }
     }
 

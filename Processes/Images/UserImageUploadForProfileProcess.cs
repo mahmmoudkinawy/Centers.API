@@ -1,5 +1,5 @@
 ﻿namespace Centers.API.Processes.Images;
-public sealed class UserImageUploadProcess
+public sealed class UserImageUploadForProfileProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {

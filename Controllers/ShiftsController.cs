@@ -72,6 +72,25 @@ public sealed class ShiftsController : ControllerBase
         return NoContent();
     }
 
+
+    [HttpPut("{shiftId:guid}")]
+    public async Task<IActionResult> UpdateShift(
+        [FromBody] UpdateShiftProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
+
+
     [HttpDelete("{shiftId}")]
     public async Task<IActionResult> RemoveShift(
         [FromRoute] Guid shiftId,

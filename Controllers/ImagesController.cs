@@ -34,12 +34,12 @@ public sealed class ImagesController : ControllerBase
     /// <response code="400">Validation errors.</response>
     /// <response code="401">Unauthorized - User does not exist.</response>
     [Authorize]
-    [HttpPost("upload-image")]
+    [HttpPost("upload-user-profile-image")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> UploadImageForUser(
-        [FromForm] UserImageUploadProcess.Request request,
+        [FromForm] UserImageUploadForProfileProcess.Request request,
         CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
