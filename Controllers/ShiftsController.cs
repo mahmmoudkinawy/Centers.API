@@ -14,6 +14,47 @@ public sealed class ShiftsController : ControllerBase
             throw new ArgumentNullException(nameof(mediator));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetShifts(
+        [FromQuery] ShiftParams shiftParams,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new CetShiftsProcess.Request
+            {
+                Keyword = shiftParams.Keyword,
+                PageNumber = shiftParams.PageNumber,
+                PageSize = shiftParams.PageSize
+            }, cancellationToken);
+
+        Response.AddPaginationHeader(
+            response.CurrentPage,
+            response.PageSize,
+            response.TotalPages,
+            response.TotalCount);
+
+        return Ok(response);
+    }
+
+    [HttpGet("{shiftId}")]
+    public async Task<IActionResult> GetShift(
+       [FromRoute] Guid shiftId,
+       CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new CetShiftByIdProcess.Request
+            {
+                ShiftId = shiftId
+            }, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return NotFound(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateShift(
         [FromBody] CreateShiftProcess.Request request,
@@ -26,6 +67,25 @@ public sealed class ShiftsController : ControllerBase
         if (!response.IsSuccess)
         {
             return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
+
+    [HttpDelete("{shiftId}")]
+    public async Task<IActionResult> RemoveShift(
+        [FromRoute] Guid shiftId,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new RemoveShiftProcess.Request
+            {
+                ShiftId = shiftId
+            }, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return NotFound(response.Errors);
         }
 
         return NoContent();

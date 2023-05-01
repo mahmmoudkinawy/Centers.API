@@ -1,9 +1,9 @@
-﻿namespace Centers.API.Processes.Subjects;
-public sealed class RemoveSubjectProcess
+﻿namespace Centers.API.Processes.Shifts;
+public sealed class RemoveShiftProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {
-        public Guid SubjectId { get; set; }
+        public Guid ShiftId { get; set; }
     }
 
     public sealed class Response { }
@@ -21,26 +21,25 @@ public sealed class RemoveSubjectProcess
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var subject = await _context.Subjects.FindAsync(
-                new object?[] { request.SubjectId },
-                cancellationToken: cancellationToken);
+            var shift = await _context.Shifts
+                .FindAsync(new object?[] { request.ShiftId }, cancellationToken: cancellationToken);
 
-            if (subject is null)
+            if (shift is null)
             {
                 return Result<Response>.Failure(
-                new List<string> { "We're sorry, but the subject with the given ID does not exist. Please check the ID and try again." });
+                new List<string> { "We're sorry, but the shift with the given ID does not exist. Please check the ID and try again." });
             }
 
-            _context.Subjects.Remove(subject);
-
+            _context.Shifts.Remove(shift);
             if (await _context.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Result<Response>.Success(new Response { });
             }
 
             return Result<Response>.Failure(
-                new List<string> { "We're sorry, but there was an error removing the subject from the database. Please try again later." });
-        }
-    }
+                new List<string> { "We're sorry, but there was an error removing the shift from the database. Please try again later." });
 
+        }
+
+    }
 }
