@@ -40,6 +40,7 @@ public static class ApplicationServiceExtensions
             await dbContext.Database.MigrateAsync();
             await Seed.SeedRolesAsync(roleManager);
             await Seed.SeedUsersAsync(userManager);
+            await Seed.SeedSubjectsAndCenters(dbContext);
         }
         catch (Exception ex)
         {

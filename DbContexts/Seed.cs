@@ -110,20 +110,48 @@ public static class Seed
             Constants.Roles.Student
         });
 
-        var centerAdminUser = new UserEntity
+        var centerAdminUsers = new List<UserEntity>
         {
-            Id = Guid.NewGuid(),
-            FirstName = "Admin",
-            LastName = "Center",
-            Email = "admincenter@test.com",
-            UserName = "admincenter@test.com",
-            Gender = "Female",
-            PhoneNumber = "01208534241",
-            PhoneNumberConfirmed = true
+            new UserEntity
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Admin",
+                LastName = "Center 1",
+                Email = "admincenter1@test.com",
+                UserName = "admincenter1@test.com",
+                Gender = "Female",
+                PhoneNumber = "01208534241",
+                PhoneNumberConfirmed = true
+            },
+            new UserEntity
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Admin",
+                LastName = "Center 2",
+                Email = "admincenter2@test.com",
+                UserName = "admincenter2@test.com",
+                Gender = "Male",
+                PhoneNumber = "01208534245",
+                PhoneNumberConfirmed = true
+            },
+            new UserEntity
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Admin",
+                LastName = "Center 3",
+                Email = "admincenter3@test.com",
+                UserName = "admincenter3@test.com",
+                Gender = "Female",
+                PhoneNumber = "01272975803",
+                PhoneNumberConfirmed = true
+            },
         };
 
-        await userManager.CreateAsync(centerAdminUser, "Pa$$w0rd");
-        await userManager.AddToRoleAsync(centerAdminUser, Constants.Roles.CenterAdmin);
+        foreach (var centerAdminUser in centerAdminUsers)
+        {
+            await userManager.CreateAsync(centerAdminUser, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(centerAdminUser, Constants.Roles.CenterAdmin);
+        }
 
         var teacherUser = new UserEntity
         {
@@ -156,7 +184,7 @@ public static class Seed
         await userManager.AddToRoleAsync(reviewerUser, Constants.Roles.Reviewer);
 
         // Seeding some fake users for testing.
-        var fakeStudents = new Faker<UserEntity>()
+        var fakeStudents = new Faker<UserEntity>("ar")
             .RuleFor(u => u.Id, f => f.Random.Guid())
             .RuleFor(u => u.FirstName, f => f.Person.FirstName)
             .RuleFor(u => u.LastName, f => f.Person.LastName)
@@ -175,4 +203,36 @@ public static class Seed
 
     }
 
+    public static async Task SeedSubjectsAndCenters(CentersDbContext context)
+    {
+        ArgumentNullException.ThrowIfNull(nameof(context));
+
+        if (await context.Subjects.AnyAsync())
+        {
+            return;
+        }
+
+        var fakeSubjects = new Faker<SubjectEntity>("ar")
+            .RuleFor(s => s.Id, f => f.Random.Guid())
+            .RuleFor(s => s.Name, f => f.Hacker.Verb())
+            .RuleFor(s => s.Description, f => f.Lorem.Paragraph(4));
+
+        var subjects = fakeSubjects.GenerateBetween(100, 150);
+
+        context.Subjects.AddRange(subjects);
+        await context.SaveChangesAsync();
+
+        var fakeCenters = new Faker<CenterEntity>("ar")
+            .RuleFor(s => s.Id, f => f.Random.Guid())
+            .RuleFor(s => s.Name, f => f.Lorem.Word())
+            .RuleFor(s => s.Capacity, f => f.Random.Int(5, 10000))
+            .RuleFor(s => s.Description, f => f.Lorem.Paragraph(3))
+            .RuleFor(s => s.ClosingDate, f => f.Date.Between(DateTime.UtcNow, DateTime.UtcNow.AddYears(1)))
+            .RuleFor(s => s.OpeningDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-2), DateTime.UtcNow));
+
+        var centers = fakeCenters.GenerateBetween(100, 150);
+
+        context.Centers.AddRange(centers);
+        await context.SaveChangesAsync();
+    }
 }

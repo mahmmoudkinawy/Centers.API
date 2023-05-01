@@ -3,6 +3,7 @@
 [Route("api/v{version:apiVersion}/subjects")]
 [ApiController]
 [ApiVersion("1.0")]
+[Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
 public sealed class SubjectsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -37,7 +38,6 @@ public sealed class SubjectsController : ControllerBase
     /// <response code="200">Returns the all the subjects.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
-    [Authorize]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -64,6 +64,50 @@ public sealed class SubjectsController : ControllerBase
     }
 
     /// <summary>
+    /// Get subject by id endpoint.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns the center</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /subjects/5e7c6724-a3e4-4916-ff73-08db45b55673
+    ///     {
+    ///         "id":"5e7c6724-a3e4-4916-ff73-08db45b55673",
+    ///         "name": "Physics",
+    ///         "description": "Physics Description"
+    ///     }
+    /// </remarks>
+    /// <response code="200">Returns the subject bu the it's id.</response>
+    /// <response code="404">No subject matches this id.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [HttpGet("{subjectId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCenterById(
+        [FromRoute] Guid subjectId,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetSubjectByIdProcess.Request
+            {
+                SubjectId = subjectId
+            }, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return NotFound(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
+
+
+    /// <summary>
     /// Create a subject endpoint.
     /// </summary>
     /// <param name="request"></param>
@@ -82,7 +126,6 @@ public sealed class SubjectsController : ControllerBase
     /// <response code="400">Validation errors.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
-    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -123,7 +166,6 @@ public sealed class SubjectsController : ControllerBase
     /// <response code="400">Validation errors.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
-    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpPut("{subjectId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -160,7 +202,6 @@ public sealed class SubjectsController : ControllerBase
     /// <response code="204">Returns not content.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
-    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpDelete("{subjectId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

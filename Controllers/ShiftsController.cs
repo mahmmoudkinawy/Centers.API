@@ -14,6 +14,21 @@ public sealed class ShiftsController : ControllerBase
             throw new ArgumentNullException(nameof(mediator));
     }
 
+    [HttpPost]
+    public async Task<IActionResult> CreateShift(
+        [FromBody] CreateShiftProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
 
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
 
 }

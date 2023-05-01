@@ -9,6 +9,7 @@ global using Centers.API.Processes.Account;
 global using Centers.API.Processes.Centers;
 global using Centers.API.Processes.Images;
 global using Centers.API.Processes.Otps;
+global using Centers.API.Processes.Shifts;
 global using Centers.API.Processes.Subjects;
 global using Centers.API.Processes.Users;
 global using Centers.API.Services;
@@ -38,3 +39,4 @@ global using System.Text;
 global using System.Text.Json;
 global using Twilio;
 global using Twilio.Rest.Api.V2010.Account;
+
