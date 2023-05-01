@@ -138,7 +138,7 @@ public sealed class AccountController : ControllerBase
     ///     POST /verify-otp
     ///     {
     ///        "phoneNumber":"+201208534244",
-    ///        "otpCode":"Pa$$w0rd"
+    ///        "otpCode":"255326"
     ///     }
     /// </remarks>
     /// <response code="200">Returns if the operations is successful or not.</response>

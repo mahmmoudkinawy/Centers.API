@@ -9,7 +9,7 @@ public sealed class UserLoginProcess
 
     public sealed class Response
     {
-        public string Name { get; set; }
+        public string FullName { get; set; }
         public string ImageUrl { get; set; }
         public string Token { get; set; }
     }
@@ -77,7 +77,7 @@ public sealed class UserLoginProcess
 
             return Result<Response>.Success(new Response
             {
-                Name = $"{user.FirstName} {user.LastName}",
+                FullName = $"{user.FirstName} {user.LastName}",
                 ImageUrl = user.Images.MaxBy(i => i.CreatedAt)?.ImageUrl ?? null,
                 Token = await _tokenService.CreateTokenAsync(user)
             });

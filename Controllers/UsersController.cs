@@ -3,7 +3,6 @@
 [Route("api/v{version:apiVersion}/users")]
 [ApiController]
 [ApiVersion("1.0")]
-[Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
 public sealed class UsersController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -12,6 +11,18 @@ public sealed class UsersController : ControllerBase
     {
         _mediator = mediator ??
             throw new ArgumentNullException(nameof(mediator));
+    }
+
+    [Authorize]
+    [HttpGet("current-user-profile")]
+    public async Task<IActionResult> GetCurrentUserProfile(
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetCurrentUserProfileProcess.Request { },
+            cancellationToken);
+
+        return Ok(response);
     }
 
     /// <summary>
@@ -43,12 +54,13 @@ public sealed class UsersController : ControllerBase
     /// </remarks>
     /// <response code="200">Returns the all the users.</response>
     /// <response code="401">User does not exist.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetUsers(
-        [FromQuery] UserParams userParams,
-        CancellationToken cancellationToken)
+            [FromQuery] UserParams userParams,
+            CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
             new GetUsersProcess.Request
@@ -93,6 +105,7 @@ public sealed class UsersController : ControllerBase
     /// <response code="200">Returns what is the next step that user will do to use the account..</response>
     /// <response code="401">Validation errors.</response>
     /// <response code="401">User does not exist.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -138,6 +151,7 @@ public sealed class UsersController : ControllerBase
     /// <response code="200">Returns if the whole operation succeed or not.</response>
     /// <response code="401">Validation errors.</response>
     /// <response code="401">User does not exist.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpPut("{userId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -171,6 +185,7 @@ public sealed class UsersController : ControllerBase
     /// </remarks>
     /// <response code="200">Returns the all the users.</response>
     /// <response code="401">User does not exist.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpDelete("{userId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
