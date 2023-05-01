@@ -38,6 +38,10 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .HasForeignKey(ui => ui.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<UserEntity>()
+            .Property(u => u.IsActive)
+            .HasDefaultValue(true);
+
         builder.Entity<ShiftEntity>()
             .HasOne(c => c.Center)
             .WithMany(s => s.Shifts)

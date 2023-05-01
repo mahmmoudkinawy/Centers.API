@@ -13,8 +13,21 @@ public sealed class UsersController : ControllerBase
             throw new ArgumentNullException(nameof(mediator));
     }
 
+    /// <summary>
+    /// current user endpoint to get the current user profile.
+    /// </summary>
+    /// <returns>Returns the user data from the eb as the model will describe.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /current-user-profile
+    /// </remarks>
+    /// <response code="200">Returns the user data from the eb as the model will describe.</response>
+    /// <response code="401">User does not exist.</response>
     [Authorize]
     [HttpGet("current-user-profile")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetCurrentUserProfile(
         CancellationToken cancellationToken)
     {
@@ -199,6 +212,45 @@ public sealed class UsersController : ControllerBase
             {
                 UserId = userId
             }, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
+
+
+    /// <summary>
+    /// Activate some User active or not by admin.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="userUpdateStatus"></param>
+    /// <returns>Returns no content</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     PUT users/be0b6bca-ca43-426e-9024-ec1a52e3235a
+    ///     {
+    ///         "isActive":false
+    ///     }
+    /// </remarks>
+    /// <response code="204">Returns no content if the operation succeeded.</response>
+    /// <response code="400">If the update got some error.</response>
+    /// <response code="404">User with the given id does not exist.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
+    [HttpPut("{userId:guid}/activate")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ActivateUserBySuperAdmin(
+        [FromBody] ActivateUserAccountByAdminProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
 
         if (!response.IsSuccess)
         {

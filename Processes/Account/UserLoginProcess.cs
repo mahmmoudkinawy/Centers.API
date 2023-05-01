@@ -57,6 +57,14 @@ public sealed class UserLoginProcess
                 });
             }
 
+            if (!user.IsActive)
+            {
+                return Result<Response>.Failure(new List<string>
+                {
+                    "Your account has been locked. Please contact the administrator for further support."
+                });
+            }
+
             var result = await _userManager.CheckPasswordAsync(user, request.Password);
 
             if (!result)

@@ -4,6 +4,7 @@ using Centers.API.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Centers.API.DbContexts.Migrations
 {
     [DbContext(typeof(CentersDbContext))]
-    partial class CentersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230501192836_AlteredUsersTableAndAddedIsActiveColumn")]
+    partial class AlteredUsersTableAndAddedIsActiveColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
