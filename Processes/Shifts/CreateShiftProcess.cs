@@ -5,6 +5,7 @@ public sealed class CreateShiftProcess
     {
         public DateTime? ShiftStartTime { get; set; }
         public DateTime? ShiftEndTime { get; set; }
+        public int? Capacity { get; set; }
         public Guid CenterId { get; set; }
         public Guid AdminId { get; set; }
         public ICollection<Guid> SubjectIds { get; set; }
@@ -27,6 +28,22 @@ public sealed class CreateShiftProcess
             RuleFor(r => r.ShiftEndTime)
                 .NotNull()
                 .GreaterThan(r => r.ShiftStartTime);
+
+            RuleFor(r => r.Capacity)
+                .NotNull()
+                .GreaterThan(0)
+                .Must((request, capacity) =>
+                {
+                    var center = _context.Centers.Find(request.CenterId);
+
+                    if (center == null)
+                    {
+                        return false;
+                    }
+
+                    return center.Capacity >= request.Capacity;
+                })
+                .WithMessage("The capacity of the reservation must not exceed the original capacity of the center it is reserved for.");
 
             RuleFor(r => r.CenterId)
                 .NotEqual(r => r.AdminId)

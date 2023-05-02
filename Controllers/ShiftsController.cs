@@ -30,6 +30,7 @@ public sealed class ShiftsController : ControllerBase
     ///             "shiftStartTime": "2023-05-01T17:58:05.82Z",
     ///             "shiftEndTime": "2023-05-03T17:58:05.82Z",
     ///             "centerName": "حقيقة",
+    ///             "capacity": 348,
     ///             "centerId": "808e2447-bc6e-cc57-e2fb-07aa702a94e0",
     ///             "adminName": "Admin Center 2",
     ///             "adminId": "2fb8d84f-f9da-4ed8-b5d2-2f68a049b1e7",
@@ -50,6 +51,7 @@ public sealed class ShiftsController : ControllerBase
     ///             "shiftStartTime": "2023-06-01T17:58:05.82Z",
     ///             "shiftEndTime": "2023-06-03T17:58:05.82Z",
     ///             "centerName": "لا",
+    ///             "capacity": 348,
     ///             "centerId": "808e2447-bc6e-cc57-e2fb-07aa702a94e1",
     ///             "adminName": "Admin Center 5",
     ///             "adminId": "2fb8d84f-f9da-4ed8-b5d2-2f68a049b1e1",
@@ -112,6 +114,7 @@ public sealed class ShiftsController : ControllerBase
     ///             "shiftStartTime": "2023-05-01T17:58:05.82Z",
     ///             "shiftEndTime": "2023-05-03T17:58:05.82Z",
     ///             "centerName": "حقيقة",
+    ///             "capacity": 348,
     ///             "centerId": "808e2447-bc6e-cc57-e2fb-07aa702a94e0",
     ///             "adminName": "Admin Center 2",
     ///             "adminId": "2fb8d84f-f9da-4ed8-b5d2-2f68a049b1e7",
@@ -170,6 +173,7 @@ public sealed class ShiftsController : ControllerBase
     ///         "shiftStartTime": "2023-05-01T17:58:05.820Z",
     ///         "shiftEndTime": "2023-05-03T17:58:05.820Z",
     ///         "centerId": "808e2447-bc6e-cc57-e2fb-07aa702a94e0",
+    ///         "capacity": 348,
     ///         "adminId": "2fb8d84f-f9da-4ed8-b5d2-2f68a049b1e7",
     ///         "subjectIds": [
     ///             "a3cec1a5-ec78-1615-1d7d-02f1aa2a9b29",
@@ -218,6 +222,7 @@ public sealed class ShiftsController : ControllerBase
     ///         "shiftStartTime": "2023-05-01T17:58:05.820Z",
     ///         "shiftEndTime": "2023-05-08T17:58:05.820Z",
     ///         "centerId": "808e2447-bc6e-cc57-e2fb-07aa702a94e0",
+    ///         "capacity": 348,
     ///         "adminId": "2fb8d84f-f9da-4ed8-b5d2-2f68a049b1e7",
     ///         "subjectIds": [
     ///             "a3cec1a5-ec78-1615-1d7d-02f1aa2a9b29"

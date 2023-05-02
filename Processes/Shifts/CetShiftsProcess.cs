@@ -14,6 +14,7 @@ public sealed class CetShiftsProcess
         public DateTime ShiftStartTime { get; set; }
         public DateTime ShiftEndTime { get; set; }
         public string CenterName { get; set; }
+        public int CenterCapacity { get; set; }
         public Guid CenterId { get; set; }
         public string AdminName { get; set; }
         public Guid AdminId { get; set; }
@@ -34,6 +35,7 @@ public sealed class CetShiftsProcess
             CreateMap<ShiftEntity, Response>()
                 .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => $"{src.Admin.FirstName} {src.Admin.LastName}"))
                 .ForMember(dest => dest.CenterName, opt => opt.MapFrom(src => src.Center.Name))
+                .ForMember(dest => dest.CenterCapacity, opt => opt.MapFrom(src => src.Capacity))
                 .ForMember(dest => dest.Subjects, opt => opt.MapFrom(src => src.ShiftSubjects));
 
             CreateMap<ShiftSubjectEntity, SubjectResponse>()
