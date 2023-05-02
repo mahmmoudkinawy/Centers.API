@@ -8,6 +8,7 @@ public static class Constants
 
     public sealed class Policies
     {
+        public const string MustBeTeacher = "MustBeTeacher";
         public const string MustBeSuperAdmin = "MustBeSuperAdmin";
     }
 

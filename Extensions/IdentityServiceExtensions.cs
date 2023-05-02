@@ -43,6 +43,11 @@ public static class IdentityServiceExtensions
                 opts.RequireClaim(ClaimTypes.Role, Constants.Roles.SuperAdmin);
             });
 
+            builder.AddPolicy(Constants.Policies.MustBeTeacher, opts =>
+            {
+                opts.RequireClaim(ClaimTypes.Role, Constants.Roles.Teacher);
+            });
+
         });
 
         return services;

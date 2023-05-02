@@ -12,6 +12,9 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
     public DbSet<ImageEntity> Images { get; set; }
     public DbSet<ShiftEntity> Shifts { get; set; }
     public DbSet<ShiftSubjectEntity> ShiftSubjects { get; set; }
+    public DbSet<ChoiceEntity> Choices { get; set; }
+    public DbSet<QuestionEntity> Questions { get; set; }
+    public DbSet<AnswerEntity> Answers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -66,6 +69,31 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .HasOne(ss => ss.Subject)
             .WithMany()
             .HasForeignKey(ss => ss.SubjectId);
+
+        builder.Entity<ChoiceEntity>()
+            .HasOne(q => q.Question)
+            .WithMany(c => c.Choices)
+            .HasForeignKey(k => k.QuestionId);
+
+        builder.Entity<UserEntity>()
+            .HasMany(u => u.Questions)
+            .WithOne(q => q.Owner)
+            .HasForeignKey(k => k.OwnerId);
+
+        builder.Entity<QuestionEntity>()
+            .HasOne(q => q.Owner)
+            .WithMany(u => u.Questions)
+            .HasForeignKey(q => q.OwnerId);
+
+        builder.Entity<QuestionEntity>()
+            .HasOne(q => q.Answer)
+            .WithOne(q => q.Question)
+            .HasForeignKey<AnswerEntity>(a => a.QuestionId);
+
+        builder.Entity<AnswerEntity>()
+            .HasOne(q => q.Question)
+            .WithOne(q => q.Answer)
+            .HasForeignKey<QuestionEntity>(a => a.AnswerId);
 
         builder.ApplyUtcDateTimeConverter();
     }
