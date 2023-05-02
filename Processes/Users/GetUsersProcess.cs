@@ -3,11 +3,10 @@ public sealed class GetUsersProcess
 {
     public sealed class Request : IRequest<PagedList<Response>>
     {
-        // will include users, pagination, searching, ordering .... etc.
-
-        public string? Keyword { get; set; }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+        public string? Keyword { get; set; }
+        public string? Role { get; set; }
     }
 
     public sealed class Response
@@ -53,6 +52,16 @@ public sealed class GetUsersProcess
             var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
 
             var query = _userManager.Users.Where(u => u.Id != currentUserId).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(request.Role))
+            {
+                var role = request.Role.Trim();
+                var userIdsInRole = (await _userManager.GetUsersInRoleAsync(role))
+                    .Select(u => u.Id)
+                    .ToList();
+
+                query = query.Where(u => userIdsInRole.Contains(u.Id));
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Keyword))
             {

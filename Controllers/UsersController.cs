@@ -47,7 +47,7 @@ public sealed class UsersController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     GET /users
+    ///     GET /users?pageSize=1&role=AdminCenter
     ///     {    
     ///         "id": "634df3ad-cb41-4ba2-90e0-0f0390c43932",
     ///         "fullName": "Mahmoud Kinawy",
@@ -79,6 +79,7 @@ public sealed class UsersController : ControllerBase
             new GetUsersProcess.Request
             {
                 Keyword = userParams.Keyword,
+                Role = userParams.Role,
                 PageNumber = userParams.PageNumber,
                 PageSize = userParams.PageSize
             },
