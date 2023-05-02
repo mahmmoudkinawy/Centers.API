@@ -1,5 +1,5 @@
 ﻿namespace Centers.API.Processes.Questions;
-public sealed class CreateQuestionProcess
+public sealed class UpdateQuestionProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {
@@ -83,40 +83,61 @@ public sealed class CreateQuestionProcess
         {
             var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
 
-            var questionEntity = new QuestionEntity
+            var requestRouteQuery = _httpContextAccessor.HttpContext?.GetRouteData();
+
+            var questionIdFromRoute = requestRouteQuery!.Values["questionId"];
+
+            var questionId = Guid.Parse(questionIdFromRoute.ToString());
+
+            var question = await _context.Questions
+                .Include(c => c.Choices)
+                .Include(a => a.Answer)
+                .FirstOrDefaultAsync(s => s.Id == questionId && s.OwnerId == currentUserId, cancellationToken: cancellationToken);
+
+            if (question is null)
             {
-                Id = Guid.NewGuid(),
-                OwnerId = currentUserId,
-                Text = request.Text,
-                Type = request.Type
-            };
+                return Result<Response>.Failure(
+                    new List<string> { "We're sorry, but the question with the given ID does not exist. Please check the ID and try again." });
+            }
+
+            question.Type = request.Type;
+            question.Text = request.Text;
+            question.Choices = Enumerable.Empty<ChoiceEntity>().ToList();
 
             switch (request.Type)
             {
-                // Will be refactored later on.
                 case QuestionTypeEnum.MultipleChoice:
                 case QuestionTypeEnum.TrueFalse:
-                    questionEntity.Choices = request.Choices.Select(a => new ChoiceEntity
+                    question.Choices = request.Choices.Select(a => new ChoiceEntity
                     {
-                        Id = Guid.NewGuid(),
                         IsCorrect = a.IsCorrect,
                         Text = a.Text
                     }).ToList();
+                    if (question.Answer is not null)
+                    {
+                        _context.Answers.Remove(question.Answer);
+                    }
                     break;
                 case QuestionTypeEnum.FreeText:
-                    var answerEntity = new AnswerEntity
+                    if (question.Answer is null)
                     {
-                        Id = Guid.NewGuid(),
-                        Text = request.AnswerText,
-                        QuestionId = questionEntity.Id
-                    };
-                    questionEntity.Answer = answerEntity;
+                        question.Answer = new AnswerEntity
+                        {
+                            Text = request.AnswerText,
+                            QuestionId = question.Id
+                        };
+                    }
+                    else
+                    {
+                        question.Answer.Text = request.AnswerText;
+                    }
+                    question.Choices = new List<ChoiceEntity>();
                     break;
                 default:
                     throw new Exception("You have selected an invalid question type.");
             }
 
-            _context.Questions.Add(questionEntity);
+            _context.Questions.Update(question);
             if (await _context.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Result<Response>.Success(new Response { });
@@ -124,7 +145,7 @@ public sealed class CreateQuestionProcess
 
             return Result<Response>.Failure(new List<string>
             {
-                "Unable to create question. Please try again later."
+                "Unable to update question. Please try again later."
             });
         }
 
