@@ -173,6 +173,28 @@ public sealed class QuestionsController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Policy = Constants.Policies.MustBeTeacher)]
+    [HttpPost("upload-csv")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UploadCsvQuestionsFile(
+       [FromForm] UploadQuestionsByFileProcess.Request request,
+       CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
+
 
     /// <summary>
     /// Create a question 'MCQ-True/False-Free Text' endpoint.

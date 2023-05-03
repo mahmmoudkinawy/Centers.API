@@ -228,9 +228,10 @@ public static class Seed
             .RuleFor(u => u.PhoneNumber, f => f.Person.Phone)
             .RuleFor(u => u.PhoneNumberConfirmed, f => true)
             .RuleFor(u => u.NationalId, f => f.Person.Random.AlphaNumeric(15))
-            .RuleFor(u => u.Gender, f => (new[] { "Female", "Male" })[new Random().Next(2)]);
+            .RuleFor(u => u.Gender, f => (new[] { "Female", "Male" })[new Random().Next(2)])
+            .Generate(110);
 
-        foreach (var student in fakeStudents.GenerateBetween(50,50))
+        foreach (var student in fakeStudents)
         {
             await userManager.CreateAsync(student, "Pa$$w0rd");
             await userManager.AddToRoleAsync(student, Constants.Roles.Student);
@@ -250,11 +251,10 @@ public static class Seed
         var fakeSubjects = new Faker<SubjectEntity>("ar")
             .RuleFor(s => s.Id, f => Guid.NewGuid())
             .RuleFor(s => s.Name, f => f.Hacker.Verb())
-            .RuleFor(s => s.Description, f => f.Lorem.Paragraph(4));
+            .RuleFor(s => s.Description, f => f.Lorem.Paragraph(4))
+            .Generate(150);
 
-        var subjects = fakeSubjects.GenerateBetween(100, 150);
-
-        context.Subjects.AddRange(subjects);
+        context.Subjects.AddRange(fakeSubjects);
         await context.SaveChangesAsync();
 
         var fakeCenters = new Faker<CenterEntity>("ar")
@@ -263,11 +263,10 @@ public static class Seed
             .RuleFor(s => s.Capacity, f => f.Random.Int(5, 10000))
             .RuleFor(s => s.Description, f => f.Lorem.Paragraph(3))
             .RuleFor(s => s.ClosingDate, f => f.Date.Between(DateTime.UtcNow, DateTime.UtcNow.AddYears(1)))
-            .RuleFor(s => s.OpeningDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-2), DateTime.UtcNow));
+            .RuleFor(s => s.OpeningDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-2), DateTime.UtcNow))
+            .Generate(160);
 
-        var centers = fakeCenters.GenerateBetween(100, 150);
-
-        context.Centers.AddRange(centers);
+        context.Centers.AddRange(fakeCenters);
         await context.SaveChangesAsync();
     }
 }
