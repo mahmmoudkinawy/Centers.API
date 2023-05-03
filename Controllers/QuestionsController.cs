@@ -14,6 +14,114 @@ public sealed class QuestionsController : ControllerBase
     }
 
     /// <summary>
+    /// Get paginated questions for the current logged in user.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns the paginated questions for the current logged in user.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /questions/current-user-questions-with-answers
+    ///     [
+    ///         {
+    ///             "id": "f969f33a-651d-46fb-9362-aa58daa14c98",
+    ///             "questionText": "string",
+    ///             "type": "FreeText",
+    ///             "choices": [],
+    ///             "answerText": "string"
+    ///          },
+    ///          {
+    ///             "id": "78edd456-29f8-4a74-86f1-c028080293e1",
+    ///             "questionText": "string",
+    ///             "type": "TrueFalse",
+    ///             "choices": [
+    ///                 {
+    ///                     "id": "cb0e02e5-9e66-4e6e-b5d4-af2f01a0cc6e",
+    ///                     "text": "string",
+    ///                     "isCorrect": true
+    ///                 },
+    ///                 {
+    ///                     "id": "f91b357f-b357-4e25-8d6e-d00d79d2ac03",
+    ///                     "text": "string 1",
+    ///                     "isCorrect": false
+    ///                 }
+    ///              ],
+    ///             "answerText": null
+    ///         }
+    ///     ]
+    /// </remarks>
+    /// <response code="200">Returns the paginated questions for the current logged in user.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeTeacher)]
+    [HttpGet("current-user-questions-with-answers")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCurrentUserQuestionsWithAnswers(
+        [FromQuery] PaginationParams paginationParams,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetQuestionsWithAnswersProcess.Request
+            {
+                PageNumber = paginationParams.PageNumber,
+                PageSize = paginationParams.PageSize
+            }, cancellationToken);
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get question with answer by id for the current logged in user.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns the question with answer by id for the current logged in user.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /questions/current-user-question-with-answers/f969f33a-651d-46fb-9362-aa58daa14c98
+    ///     [
+    ///         {
+    ///             "id": "f969f33a-651d-46fb-9362-aa58daa14c98",
+    ///             "questionText": "string",
+    ///             "type": "FreeText",
+    ///             "choices": [],
+    ///             "answerText": "string"
+    ///          }
+    ///     ]
+    /// </remarks>
+    /// <response code="200">Get question with answers by id for the current user.</response>
+    /// <response code="404">Question does not exist.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeTeacher)]
+    [HttpGet("current-user-question-with-answers/{questionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCurrentUserQuestionsByIdWithAnswers(
+        [FromRoute] Guid questionId,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetQuestionByIdWithAnswersProcess.Request
+            {
+                QuestionId = questionId
+            }, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return NotFound(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
+
+    /// <summary>
     /// Create a question 'MCQ-True/False-Free Text' endpoint.
     /// </summary>
     /// <param name="request"></param>
@@ -34,7 +142,7 @@ public sealed class QuestionsController : ControllerBase
     ///             {
     ///                 "text": "string 1",
     ///                 "isCorrect": false
-    ///             },
+    ///             }
     ///         ],
     ///         "answerText": "string"
     ///     }
