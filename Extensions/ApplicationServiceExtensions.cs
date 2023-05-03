@@ -23,7 +23,7 @@ public static class ApplicationServiceExtensions
             .AddFluentValidation(_ => _.RegisterValidatorsFromAssemblyContaining<Program>());
 
         services.AddDbContext<CentersDbContext>(opts
-                => opts.UseSqlServer(config.GetConnectionString("DefaultConnection")));
+                => opts.UseNpgsql("User ID=postgres;Password=Pa$$w0rd;Host=localhost;Port=5432;Database=TestBulkInsertionsForCentersApp;"));
 
         return services;
     }

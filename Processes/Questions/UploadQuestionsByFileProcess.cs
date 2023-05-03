@@ -1,4 +1,7 @@
-﻿namespace Centers.API.Processes.Questions;
+﻿using EFCore.BulkExtensions;
+using System.Data.SqlClient;
+
+namespace Centers.API.Processes.Questions;
 public sealed class UploadQuestionsByFileProcess
 {
     public sealed class Request : IRequest<Result<Response>>
@@ -54,15 +57,19 @@ public sealed class UploadQuestionsByFileProcess
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly CentersDbContext _context;
 
         public Handler(
             IServiceScopeFactory serviceScopeFactory,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            CentersDbContext context)
         {
             _serviceScopeFactory = serviceScopeFactory ??
                 throw new ArgumentNullException(nameof(serviceScopeFactory));
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
+            _context = context ??
+                throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
@@ -79,42 +86,61 @@ public sealed class UploadQuestionsByFileProcess
                 });
 
             var questions = new List<QuestionEntity>();
+            var answers = new List<AnswerEntity>();
             foreach (var questionToCreate in csv.GetRecords<QuestionToCreate>())
             {
+                var questionIdToCreate = Guid.NewGuid();
+                var answerIdToCreate = Guid.NewGuid();
+
                 var questionEntity = new QuestionEntity
                 {
-                    Id = Guid.NewGuid(),
+                    Id = questionIdToCreate,
                     OwnerId = currentUserId,
                     Text = questionToCreate.QuestionText,
-                    Answer = new AnswerEntity
-                    {
-                        Id = Guid.NewGuid(),
-                        Text = questionToCreate.AnswerText
-                    },
-                    Type = request.Type
+                    Type = request.Type,
+                    AnswerId = answerIdToCreate
                 };
-                questionEntity.Answer.QuestionId = questionEntity.Id;
+
                 questions.Add(questionEntity);
+
+                var answerEntity = new AnswerEntity
+                {
+                    Id = answerIdToCreate,
+                    Text = questionToCreate.AnswerText,
+                    QuestionId = questionIdToCreate
+                };
+
+                answers.Add(answerEntity);
             }
 
-            //ThreadPool.QueueUserWorkItem(async _ =>
-            //{
-            using var scope = _serviceScopeFactory.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            Task.Run(async () =>
+            {
+                using var scope = _serviceScopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
 
-            var qu = questions.AsEnumerable();
+                await context.Answers.BulkMergeAsync(
+                    answers,
+                    options =>
+                    {
+                        options.InsertIfNotExists = true;
+                        options.ColumnPrimaryKeyExpression = answer => new { answer.Text };
+                        options.ColumnInputExpression = answer => new { answer.Text };
+                        //options.IgnoreOnMergeInsertExpression = answer => answer.Text == null; // Only insert if Text is null (i.e. it doesn't exist)
+                    }
+                );
 
-            context.Questions.AddRange(qu);
-            await context.SaveChangesAsync();
+                await context.Questions.BulkMergeAsync(questions, options =>
+                {
+                    options.InsertIfNotExists = true;
+                    options.ColumnPrimaryKeyExpression = q => q.Text;
+                    options.ColumnInputExpression = q => new { q.Type, q.OwnerId, q.AnswerId };
+                    options.ColumnOutputExpression = q => new { q.Id };
+                    options.IncludeGraph = true;
+                });
 
-            await context.Questions.BulkInsertAsync(qu);
-
-            await context.BulkSaveChangesAsync();
-
-            //await context.BulkMergeAsync(qu);
-
-            //await context.SaveChangesAsync();
-            //});
+            }, cancellationToken);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
             return Result<Response>.Success(new Response { });
         }
