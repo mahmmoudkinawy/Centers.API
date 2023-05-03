@@ -45,7 +45,9 @@ public sealed class GetCentersProcess
 
         public async Task<PagedList<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var query = _context.Centers.AsQueryable();
+            var query = _context.Centers
+                .OrderBy(c => c.Id)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(request.Keyword))
             {

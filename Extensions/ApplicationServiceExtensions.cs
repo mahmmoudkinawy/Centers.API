@@ -38,9 +38,9 @@ public static class ApplicationServiceExtensions
         try
         {
             await dbContext.Database.MigrateAsync();
+            await Seed.SeedSubjectsAndCenters(dbContext);
             await Seed.SeedRolesAsync(roleManager);
             await Seed.SeedUsersAsync(userManager);
-            await Seed.SeedSubjectsAndCenters(dbContext);
         }
         catch (Exception ex)
         {

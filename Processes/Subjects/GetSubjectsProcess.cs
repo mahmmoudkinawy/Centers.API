@@ -40,7 +40,9 @@ public sealed class GetSubjectsProcess
 
         public async Task<PagedList<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var query = _context.Subjects.AsQueryable();
+            var query = _context.Subjects
+                .OrderBy(c => c.Id)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(request.Keyword))
             {

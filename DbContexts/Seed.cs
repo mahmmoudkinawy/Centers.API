@@ -188,7 +188,7 @@ public static class Seed
                 FirstName = "Teacher",
                 LastName = "Kino 3",
                 NationalId = "15-53362-55",
-                Email = "teache31@test.com",
+                Email = "teacher3@test.com",
                 UserName = "teacher3@test.com",
                 Gender = "Male",
                 PhoneNumber = "01271128542",
@@ -229,7 +229,7 @@ public static class Seed
             .RuleFor(u => u.PhoneNumberConfirmed, f => true)
             .RuleFor(u => u.NationalId, f => f.Person.Random.AlphaNumeric(15))
             .RuleFor(u => u.Gender, f => (new[] { "Female", "Male" })[new Random().Next(2)])
-            .Generate(110);
+            .Generate(70);
 
         foreach (var student in fakeStudents)
         {
