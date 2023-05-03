@@ -39,7 +39,7 @@ public sealed class UploadQuestionsByFileProcess
         }
     }
 
-    public sealed class QuestionToCreate
+    public sealed class QuestionToBeCreateFromCsvFile
     {
         // will only work for Type 2 and it's 'FreeText' until now.
 
@@ -57,8 +57,7 @@ public sealed class UploadQuestionsByFileProcess
 
         public Handler(
             IServiceScopeFactory serviceScopeFactory,
-            IHttpContextAccessor httpContextAccessor,
-            CentersDbContext context)
+            IHttpContextAccessor httpContextAccessor)
         {
             _serviceScopeFactory = serviceScopeFactory ??
                 throw new ArgumentNullException(nameof(serviceScopeFactory));
@@ -81,30 +80,43 @@ public sealed class UploadQuestionsByFileProcess
 
             var questions = new List<QuestionEntity>();
             var answers = new List<AnswerEntity>();
-            foreach (var questionToCreate in csv.GetRecords<QuestionToCreate>())
+            foreach (var questionToCreate in csv.GetRecords<QuestionToBeCreateFromCsvFile>())
             {
                 var questionIdToCreate = Guid.NewGuid();
-                var answerIdToCreate = Guid.NewGuid();
 
                 var questionEntity = new QuestionEntity
                 {
                     Id = questionIdToCreate,
                     OwnerId = currentUserId,
-                    Text = questionToCreate.QuestionText,
                     Type = request.Type,
-                    AnswerId = answerIdToCreate
                 };
+
+                switch (request.Type)
+                {
+                    // Later on will continue this logic.
+                    case QuestionTypeEnum.MultipleChoice:
+                    case QuestionTypeEnum.TrueFalse:
+                        return Result<Response>.Failure(new List<string>
+                        {
+                            "The logic for Multiple Choice Questions and True False does not implemented yet."
+                        });
+                    case QuestionTypeEnum.FreeText:
+                        var answerIdToCreate = Guid.NewGuid();
+                        var answerEntity = new AnswerEntity
+                        {
+                            Id = answerIdToCreate,
+                            Text = questionToCreate.AnswerText,
+                            QuestionId = questionIdToCreate
+                        };
+                        questionEntity.Text = questionToCreate.QuestionText;
+                        questionEntity.AnswerId = answerIdToCreate;
+                        answers.Add(answerEntity);
+                        break;
+                    default:
+                        throw new Exception("You have selected an invalid question type.");
+                }
 
                 questions.Add(questionEntity);
-
-                var answerEntity = new AnswerEntity
-                {
-                    Id = answerIdToCreate,
-                    Text = questionToCreate.AnswerText,
-                    QuestionId = questionIdToCreate
-                };
-
-                answers.Add(answerEntity);
             }
 
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -113,25 +125,11 @@ public sealed class UploadQuestionsByFileProcess
                 using var scope = _serviceScopeFactory.CreateScope();
                 var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
 
-                await context.Answers.BulkMergeAsync(
-                    answers,
-                    options =>
-                    {
-                        options.InsertIfNotExists = true;
-                        options.ColumnPrimaryKeyExpression = answer => new { answer.Text };
-                        options.ColumnInputExpression = answer => new { answer.Text };
-                        //options.IgnoreOnMergeInsertExpression = answer => answer.Text == null; // Only insert if Text is null (i.e. it doesn't exist)
-                    }
-                );
-
-                await context.Questions.BulkMergeAsync(questions, options =>
-                {
-                    options.InsertIfNotExists = true;
-                    options.ColumnPrimaryKeyExpression = q => q.Text;
-                    options.ColumnInputExpression = q => new { q.Type, q.OwnerId, q.AnswerId };
-                    options.ColumnOutputExpression = q => new { q.Id };
-                    options.IncludeGraph = true;
-                });
+                // To ensure that all the steps are completed together or none of them at all, it is necessary for it to be treated as a transaction.
+                using var transaction = await context.Database.BeginTransactionAsync();
+                await context.Answers.BulkMergeAsync(answers);
+                await context.Questions.BulkMergeAsync(questions);
+                await transaction.CommitAsync();
 
             }, cancellationToken);
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed

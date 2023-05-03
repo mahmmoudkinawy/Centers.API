@@ -70,6 +70,12 @@ public sealed class QuestionsController : ControllerBase
                 PageSize = paginationParams.PageSize
             }, cancellationToken);
 
+        Response.AddPaginationHeader(
+            response.CurrentPage,
+            response.PageSize,
+            response.TotalPages,
+            response.TotalCount);
+
         return Ok(response);
     }
 
@@ -173,6 +179,28 @@ public sealed class QuestionsController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>
+    /// Endpoint for uploading a CSV file of questions.
+    /// </summary>
+    /// <param name="file">The CSV file containing questions.</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns no content.</returns>
+    /// <remarks>
+    ///     
+    ///     Sample request:
+    ///
+    ///         POST /questions/upload-csv
+    ///         Content-Type: multipart/form-data
+    ///
+    ///         --boundary
+    ///         Content-Disposition: form-data; name="file"; filename="questions.csv"
+    ///         Content-Type: text/csv
+    ///
+    /// </remarks>
+    /// <response code="204">Returns no content.</response>
+    /// <response code="400">Validation errors.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
     [Authorize(Policy = Constants.Policies.MustBeTeacher)]
     [HttpPost("upload-csv")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

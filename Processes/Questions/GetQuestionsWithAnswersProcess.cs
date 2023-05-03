@@ -64,6 +64,7 @@ public sealed class GetQuestionsWithAnswersProcess
 
             var query = _context.Questions
                 .Where(q => q.OwnerId == currentUserId)
+                .OrderBy(q => q.Id)
                 .AsQueryable();
 
             return await PagedList<Response>.CreateAsync(
