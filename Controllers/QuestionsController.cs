@@ -225,7 +225,7 @@ public sealed class QuestionsController : ControllerBase
 
 
     /// <summary>
-    /// Create a question 'MCQ-True/False-Free Text' endpoint.
+    /// Create a question 'MCQ - True/False - Free Text' endpoint.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>

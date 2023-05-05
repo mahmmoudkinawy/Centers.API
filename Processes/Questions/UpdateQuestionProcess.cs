@@ -112,6 +112,7 @@ public sealed class UpdateQuestionProcess
             var question = await _context.Questions
                 .Include(c => c.Choices)
                 .Include(a => a.Answer)
+                .Include(q => q.Images)
                 .FirstOrDefaultAsync(s => s.Id == questionId && s.OwnerId == currentUserId, cancellationToken: cancellationToken);
 
             if (question is null)

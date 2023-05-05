@@ -31,7 +31,7 @@ public sealed class GetQuestionByIdWithAnswersProcess
                 .ForMember(dest => dest.QuestionText, opt => opt.MapFrom(src => src.Text))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString())) // Will be refactored later on.
                 .ForMember(dest => dest.AnswerText, opt => opt.MapFrom(src => src.Answer.Text ?? null))
-                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Images.MaxBy(i => i.ImageUrl).ImageUrl));
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Images.OrderByDescending(i => i.CreatedAt).FirstOrDefault().ImageUrl));
 
             CreateMap<ChoiceEntity, ChoiceResponse>();
         }

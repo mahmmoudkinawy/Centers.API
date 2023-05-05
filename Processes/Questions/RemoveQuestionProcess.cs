@@ -27,8 +27,11 @@ public sealed class RemoveQuestionProcess
         {
             var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
 
+            // I know that i cam avoid all of that if i used Cascade 
+            // But I need that.
             var question = await _context.Questions
                 .Include(c => c.Answer)
+                .Include(q => q.Images)
                 .FirstOrDefaultAsync(q => q.Id == request.QuestionId && q.OwnerId == currentUserId, cancellationToken: cancellationToken);
 
             if (question is null)
@@ -42,6 +45,11 @@ public sealed class RemoveQuestionProcess
             if (question.Answer is not null)
             {
                 _context.Answers.Remove(question.Answer);
+            }
+
+            if (question.Images.Any())
+            {
+                _context.Images.RemoveRange(question.Images);
             }
 
             if (await _context.SaveChangesAsync(cancellationToken) > 0)

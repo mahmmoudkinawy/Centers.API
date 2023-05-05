@@ -35,7 +35,7 @@ public sealed class GetQuestionsWithAnswersProcess
                 .ForMember(dest => dest.QuestionText, opt => opt.MapFrom(src => src.Text))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
                 .ForMember(dest => dest.AnswerText, opt => opt.MapFrom(src => src.Answer.Text ?? null))
-                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Images.MaxBy(i => i.ImageUrl).ImageUrl));
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Images.OrderByDescending(i => i.CreatedAt).FirstOrDefault().ImageUrl));
 
             CreateMap<ChoiceEntity, ChoiceResponse>();
         }
@@ -65,12 +65,15 @@ public sealed class GetQuestionsWithAnswersProcess
             var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
 
             var query = _context.Questions
+                .Include(q => q.Images)
+                .Include(q => q.Choices)
+                .Include(q => q.Answer)
                 .Where(q => q.OwnerId == currentUserId)
                 .OrderBy(q => q.Id)
                 .AsQueryable();
 
             return await PagedList<Response>.CreateAsync(
-                query.ProjectTo<Response>(_mapper.ConfigurationProvider),
+                query.ProjectTo<Response>(_mapper.ConfigurationProvider).AsNoTrackingWithIdentityResolution(),
                 request.PageNumber,
                 request.PageSize);
         }
