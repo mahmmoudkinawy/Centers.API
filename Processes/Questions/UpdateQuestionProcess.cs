@@ -7,6 +7,7 @@ public sealed class UpdateQuestionProcess
         public QuestionTypeEnum Type { get; set; }
         public ICollection<ChoiceRequest> Choices { get; set; } = new List<ChoiceRequest>();
         public string AnswerText { get; set; }
+        public IFormFile? ImageFile { get; set; }
     }
 
     public sealed class ChoiceRequest
@@ -21,6 +22,21 @@ public sealed class UpdateQuestionProcess
     {
         public Validator()
         {
+            RuleFor(i => i.ImageFile)
+               .Must(image =>
+               {
+                   if (image is null || image.Length == 0)
+                   {
+                       return true;
+                   }
+
+                   var extension = Path.GetExtension(image.FileName).ToLower();
+                   return extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif";
+               })
+               .WithMessage("Image must be a JPG, PNG, JIF, or JPEG.")
+               .Must(imageData => imageData is null || imageData.Length <= 10 * 1024 * 1024)
+               .WithMessage($"Image must be smaller than 10MB.");
+
             RuleFor(q => q.Type)
                 .NotNull()
                 .IsInEnum()
@@ -40,7 +56,7 @@ public sealed class UpdateQuestionProcess
                     var correctChoices = choices.Where(c => c.IsCorrect);
                     return correctChoices.Count() == 1;
                 })
-                .When(q => q.Type == QuestionTypeEnum.MultipleChoice || q.Type == QuestionTypeEnum.TrueFalse)
+                .When(q => q.Type == QuestionTypeEnum.MultipleChoice)
                 .WithMessage("Exactly one choice must be marked as correct.");
 
             RuleForEach(q => q.Choices)
@@ -53,7 +69,7 @@ public sealed class UpdateQuestionProcess
                     choice.RuleFor(c => c.IsCorrect)
                         .NotNull();
                 })
-                .When(q => q.Type == QuestionTypeEnum.MultipleChoice || q.Type == QuestionTypeEnum.TrueFalse)
+                .When(q => q.Type == QuestionTypeEnum.MultipleChoice)
                 .WithMessage("Exactly one choice must be marked as correct.");
 
             RuleFor(q => q.AnswerText)
@@ -68,15 +84,19 @@ public sealed class UpdateQuestionProcess
     {
         private readonly CentersDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IPhotoService _photoService;
 
         public Handler(
             CentersDbContext context,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IPhotoService photoService)
         {
             _context = context ??
                 throw new ArgumentNullException(nameof(context));
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
+            _photoService = photoService ??
+                throw new ArgumentNullException(nameof(photoService));
         }
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
@@ -100,14 +120,13 @@ public sealed class UpdateQuestionProcess
                     new List<string> { "We're sorry, but the question with the given ID does not exist. Please check the ID and try again." });
             }
 
-            question.Type = request.Type;
+            question.Type = request.Type.ToString();
             question.Text = request.Text;
             question.Choices = Enumerable.Empty<ChoiceEntity>().ToList();
 
             switch (request.Type)
             {
                 case QuestionTypeEnum.MultipleChoice:
-                case QuestionTypeEnum.TrueFalse:
                     question.Choices = request.Choices.Select(a => new ChoiceEntity
                     {
                         IsCorrect = a.IsCorrect,
@@ -138,6 +157,21 @@ public sealed class UpdateQuestionProcess
             }
 
             _context.Questions.Update(question);
+
+            if (request.ImageFile is not null)
+            {
+                var imageUploadUrl = await _photoService.UploadPhotoAsync(request.ImageFile);
+
+                var imageEntity = new ImageEntity
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    ImageUrl = imageUploadUrl,
+                    QuestionId = question.Id
+                };
+                _context.Images.Add(imageEntity);
+            }
+
             if (await _context.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Result<Response>.Success(new Response { });

@@ -229,7 +229,7 @@ public static class Seed
             .RuleFor(u => u.PhoneNumberConfirmed, f => true)
             .RuleFor(u => u.NationalId, f => f.Person.Random.AlphaNumeric(15))
             .RuleFor(u => u.Gender, f => (new[] { "Female", "Male" })[new Random().Next(2)])
-            .Generate(70);
+            .Generate(69);
 
         foreach (var student in fakeStudents)
         {

@@ -164,7 +164,7 @@ public sealed class QuestionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> CreateQuestion(
-        [FromBody] CreateQuestionProcess.Request request,
+        [FromForm] CreateQuestionProcess.Request request,
         CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
@@ -265,7 +265,7 @@ public sealed class QuestionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdateQuestion(
-      [FromBody] UpdateQuestionProcess.Request request,
+      [FromForm] UpdateQuestionProcess.Request request,
       CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(

@@ -17,6 +17,7 @@ public sealed class GetQuestionsWithAnswersProcess
         public string Type { get; set; }
         public ICollection<ChoiceResponse> Choices { get; set; } = new List<ChoiceResponse>();
         public string? AnswerText { get; set; }
+        public string? ImageUrl { get; set; }
     }
 
     public sealed class ChoiceResponse
@@ -33,7 +34,8 @@ public sealed class GetQuestionsWithAnswersProcess
             CreateMap<QuestionEntity, Response>()
                 .ForMember(dest => dest.QuestionText, opt => opt.MapFrom(src => src.Text))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
-                .ForMember(dest => dest.AnswerText, opt => opt.MapFrom(src => src.Answer.Text ?? null));
+                .ForMember(dest => dest.AnswerText, opt => opt.MapFrom(src => src.Answer.Text ?? null))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Images.MaxBy(i => i.ImageUrl).ImageUrl));
 
             CreateMap<ChoiceEntity, ChoiceResponse>();
         }

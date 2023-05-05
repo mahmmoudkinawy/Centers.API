@@ -88,14 +88,13 @@ public sealed class UploadQuestionsByFileProcess
                 {
                     Id = questionIdToCreate,
                     OwnerId = currentUserId,
-                    Type = request.Type,
+                    Type = request.Type.ToString(),
                 };
 
                 switch (request.Type)
                 {
                     // Later on will continue this logic.
                     case QuestionTypeEnum.MultipleChoice:
-                    case QuestionTypeEnum.TrueFalse:
                         return Result<Response>.Failure(new List<string>
                         {
                             "The logic for Multiple Choice Questions and True False does not implemented yet."

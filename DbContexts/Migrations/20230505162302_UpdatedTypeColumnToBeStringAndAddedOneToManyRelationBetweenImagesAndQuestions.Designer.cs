@@ -4,6 +4,7 @@ using Centers.API.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Centers.API.DbContexts.Migrations
 {
     [DbContext(typeof(CentersDbContext))]
-    partial class CentersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230505162302_UpdatedTypeColumnToBeStringAndAddedOneToManyRelationBetweenImagesAndQuestions")]
+    partial class UpdatedTypeColumnToBeStringAndAddedOneToManyRelationBetweenImagesAndQuestions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,7 +125,7 @@ namespace Centers.API.DbContexts.Migrations
                     b.Property<Guid?>("QuestionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -491,7 +494,8 @@ namespace Centers.API.DbContexts.Migrations
                     b.HasOne("Centers.API.Entities.UserEntity", "User")
                         .WithMany("Images")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Question");
 

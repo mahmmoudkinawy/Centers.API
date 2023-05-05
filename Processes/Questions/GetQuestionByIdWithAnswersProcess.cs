@@ -13,6 +13,7 @@ public sealed class GetQuestionByIdWithAnswersProcess
         public string Type { get; set; }
         public ICollection<ChoiceResponse> Choices { get; set; } = new List<ChoiceResponse>();
         public string? AnswerText { get; set; }
+        public string? ImageUrl { get; set; }
     }
 
     public sealed class ChoiceResponse
@@ -29,7 +30,8 @@ public sealed class GetQuestionByIdWithAnswersProcess
             CreateMap<QuestionEntity, Response>()
                 .ForMember(dest => dest.QuestionText, opt => opt.MapFrom(src => src.Text))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString())) // Will be refactored later on.
-                .ForMember(dest => dest.AnswerText, opt => opt.MapFrom(src => src.Answer.Text ?? null));
+                .ForMember(dest => dest.AnswerText, opt => opt.MapFrom(src => src.Answer.Text ?? null))
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Images.MaxBy(i => i.ImageUrl).ImageUrl));
 
             CreateMap<ChoiceEntity, ChoiceResponse>();
         }
@@ -61,6 +63,7 @@ public sealed class GetQuestionByIdWithAnswersProcess
             var question = await _context.Questions
                 .Include(q => q.Choices)
                 .Include(q => q.Answer)
+                .Include(q => q.Images)
                 .FirstOrDefaultAsync(q => q.Id == request.QuestionId && q.OwnerId == currentUserId,
                     cancellationToken: cancellationToken);
 

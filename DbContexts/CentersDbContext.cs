@@ -95,6 +95,11 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .WithOne(q => q.Answer)
             .HasForeignKey<QuestionEntity>(a => a.AnswerId);
 
+        builder.Entity<QuestionEntity>()
+            .HasMany(i => i.Images)
+            .WithOne(q => q.Question)
+            .HasForeignKey(i => i.QuestionId);
+
         builder.ApplyUtcDateTimeConverter();
     }
 
