@@ -3,16 +3,16 @@ public sealed class UpdateQuestionProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {
-        public string Text { get; set; }
-        public QuestionTypeEnum Type { get; set; }
-        public ICollection<ChoiceRequest> Choices { get; set; } = new List<ChoiceRequest>();
-        public string AnswerText { get; set; }
+        public string? Text { get; set; }
+        public QuestionTypeEnum? Type { get; set; }
+        public ICollection<ChoiceRequest>? Choices { get; set; } = new List<ChoiceRequest>();
+        public string? AnswerText { get; set; }
         public IFormFile? ImageFile { get; set; }
     }
 
     public sealed class ChoiceRequest
     {
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public bool IsCorrect { get; set; }
     }
 

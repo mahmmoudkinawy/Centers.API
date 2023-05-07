@@ -3,16 +3,16 @@ public sealed class CreateQuestionProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {
-        public string Text { get; set; }
-        public QuestionTypeEnum Type { get; set; }
-        public ICollection<ChoiceRequest> Choices { get; set; } = new List<ChoiceRequest>();
-        public string AnswerText { get; set; }
+        public string? Text { get; set; }
+        public QuestionTypeEnum? Type { get; set; }
+        public ICollection<ChoiceRequest>? Choices { get; set; } = new List<ChoiceRequest>();
+        public string? AnswerText { get; set; }
         public IFormFile? ImageFile { get; set; }
     }
 
     public sealed class ChoiceRequest
     {
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public bool IsCorrect { get; set; }
     }
 
@@ -73,10 +73,10 @@ public sealed class CreateQuestionProcess
                 .WithMessage("Exactly one choice must be marked as correct.");
 
             RuleFor(q => q.AnswerText)
-                .NotEmpty()
                 .NotNull()
                 .When(q => q.Type == QuestionTypeEnum.FreeText)
                 .WithMessage("Answer text is required.");
+
         }
     }
 
