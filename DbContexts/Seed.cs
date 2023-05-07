@@ -243,7 +243,7 @@ public static class Seed
     {
         ArgumentNullException.ThrowIfNull(nameof(context));
 
-        if (await context.Subjects.AnyAsync())
+        if (await context.ExamDates.AnyAsync())
         {
             return;
         }
