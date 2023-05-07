@@ -118,7 +118,6 @@ public sealed class CreateShiftProcess
             var shift = _mapper.Map<ShiftEntity>(request);
 
             if (await _context.Shifts.AnyAsync(s =>
-                s.CenterId == shift.CenterId &&
                 s.AdminId == shift.AdminId &&
                 s.ShiftStartTime <= shift.ShiftEndTime &&
                 s.ShiftEndTime >= shift.ShiftStartTime, cancellationToken))

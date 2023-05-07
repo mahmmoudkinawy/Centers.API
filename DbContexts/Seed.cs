@@ -257,13 +257,25 @@ public static class Seed
         context.Subjects.AddRange(fakeSubjects);
         await context.SaveChangesAsync();
 
+        var zones = new[]
+        {
+            "Abu Dhabi",
+            "Ajman",
+            "Dubai",
+            "Fujairah",
+            "Ras al-Khaimah",
+            "Sharjah",
+            "Umm al-Quwain"
+        };
+
         var fakeCenters = new Faker<CenterEntity>("ar")
             .RuleFor(s => s.Id, f => Guid.NewGuid())
             .RuleFor(s => s.Name, f => f.Lorem.Word())
             .RuleFor(s => s.Capacity, f => f.Random.Int(5, 10000))
-            .RuleFor(s => s.Description, f => f.Lorem.Paragraph(3))
-            .RuleFor(s => s.ClosingDate, f => f.Date.Between(DateTime.UtcNow, DateTime.UtcNow.AddYears(1)))
-            .RuleFor(s => s.OpeningDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-2), DateTime.UtcNow))
+            .RuleFor(s => s.IsEnabled, f => f.Random.Bool())
+            .RuleFor(s => s.Gender, f => f.Person.Gender.ToString())
+            .RuleFor(s => s.LocationUrl, f => f.Person.Avatar)
+            .RuleFor(s => s.Zone, f => f.Random.ArrayElement(zones))
             .Generate(160);
 
         context.Centers.AddRange(fakeCenters);

@@ -157,7 +157,6 @@ public sealed class UpdateShiftProcess
 
             if (await _context.Shifts.AnyAsync(s =>
                 s.Id != shiftId &&
-                s.CenterId == request.CenterId &&
                 s.AdminId == request.AdminId &&
                 s.ShiftStartTime <= request.ShiftEndTime &&
                 s.ShiftEndTime >= request.ShiftStartTime, cancellationToken))

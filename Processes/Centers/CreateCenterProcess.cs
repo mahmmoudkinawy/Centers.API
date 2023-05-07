@@ -4,10 +4,11 @@ public sealed class CreateCenterProcess
     public sealed class Request : IRequest<Result<Response>>
     {
         public string? Name { get; set; }
+        public string? Gender { get; set; }
+        public string? Zone { get; set; }
+        public string? LocationUrl { get; set; }
         public int? Capacity { get; set; }
-        public string? Description { get; set; }
-        public DateTime? OpeningDate { get; set; }
-        public DateTime? ClosingDate { get; set; }
+        public bool? IsEnabled { get; set; }
     }
 
     public sealed class Response { }
@@ -16,7 +17,8 @@ public sealed class CreateCenterProcess
     {
         public Mapper()
         {
-            CreateMap<Request, CenterEntity>();
+            CreateMap<Request, CenterEntity>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()));
         }
     }
 
@@ -29,23 +31,56 @@ public sealed class CreateCenterProcess
                 .NotEmpty()
                 .NotNull();
 
-            RuleFor(c => c.Description)
-                .MaximumLength(3000)
+            RuleFor(c => c.Gender)
                 .NotEmpty()
-                .NotNull();
+                .NotNull()
+                .Must(gender =>
+                {
+                    var genders = new[]
+                    {
+                        "Male",
+                        "Female",
+                        "Both"
+                    };
+
+                    return genders.Contains(gender, StringComparer.OrdinalIgnoreCase);
+                })
+                .WithMessage("Gender should be either Male, Female, or Both.");
 
             RuleFor(c => c.Capacity)
                 .GreaterThan(0)
                 .NotEmpty()
                 .NotNull();
 
-            RuleFor(c => c.OpeningDate)
+            RuleFor(c => c.Zone)
+                .NotEmpty()
+                .NotNull()
+                .Must(zone =>
+                {
+                    var zones = new[]
+                    {
+                        "Abu Dhabi",
+                        "Ajman",
+                        "Dubai",
+                        "Fujairah",
+                        "Ras al-Khaimah",
+                        "Sharjah",
+                        "Umm al-Quwain"
+                    };
+
+                    return zones.Contains(zone, StringComparer.OrdinalIgnoreCase);
+                });
+
+            RuleFor(c => c.LocationUrl)
+                .NotEmpty()
+                .NotNull()
+                .Matches(@"^(https?://)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*/?$")
+                .WithMessage("LocationUrl should be a valid URL.");
+
+            RuleFor(c => c.IsEnabled)
                 .NotEmpty()
                 .NotNull();
 
-            RuleFor(c => c.ClosingDate)
-                .NotEmpty()
-                .NotNull();
         }
     }
 

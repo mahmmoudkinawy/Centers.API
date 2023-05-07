@@ -24,22 +24,6 @@ public sealed class CentersController : ControllerBase
     /// Sample request:
     ///
     ///     GET /centers
-    ///     {
-    ///         "id": "5e7c6724-a3e4-4916-ff73-08db45b55673",
-    ///         "name": "Ibn Elhithm",
-    ///         "capacity": 5000,
-    ///         "description": "Great center",
-    ///         "openingDate": "2023-05-01T08:00:00Z",
-    ///         "closingDate": "2023-10-01T08:00:00Z"
-    ///     },    
-    ///     {
-    ///         "id": "d36e0fda-47f3-4ace-ff72-08db45b55673",
-    ///         "name": "Mohamdy",
-    ///         "capacity": 2236,
-    ///         "description": "Not bad center as you know",
-    ///         "openingDate": "2023-05-01T09:00:00Z",
-    ///         "closingDate": "2023-10-01T08:30:00Z"
-    ///     }
     /// </remarks>
     /// <response code="200">Returns the all the centers.</response>
     /// <response code="401">User does not exist.</response>
@@ -80,14 +64,6 @@ public sealed class CentersController : ControllerBase
     /// Sample request:
     ///
     ///     GET /centers/5e7c6724-a3e4-4916-ff73-08db45b55673
-    ///     {
-    ///         "id": "5e7c6724-a3e4-4916-ff73-08db45b55673",
-    ///         "name": "Ibn Elhithm",
-    ///         "capacity": 5000,
-    ///         "description": "Great center",
-    ///         "openingDate": "2023-05-01T08:00:00Z",
-    ///         "closingDate": "2023-10-01T08:00:00Z"
-    ///     }
     /// </remarks>
     /// <response code="200">Returns the matched center with the given id.</response>
     /// <response code="401">User does not exist.</response>    

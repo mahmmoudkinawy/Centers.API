@@ -46,12 +46,6 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .HasDefaultValue(true);
 
         builder.Entity<ShiftEntity>()
-            .HasOne(c => c.Center)
-            .WithMany(s => s.Shifts)
-            .HasForeignKey(k => k.CenterId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Entity<ShiftEntity>()
             .HasOne(a => a.Admin)
             .WithMany()
             .HasForeignKey(k => k.AdminId)

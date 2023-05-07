@@ -32,7 +32,7 @@ public sealed class CetShiftByIdProcess
         {
             CreateMap<ShiftEntity, Response>()
                 .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => $"{src.Admin.FirstName} {src.Admin.LastName}"))
-                .ForMember(dest => dest.CenterName, opt => opt.MapFrom(src => src.Center.Name))
+                //.ForMember(dest => dest.CenterName, opt => opt.MapFrom(src => src.Center.Name))
                 .ForMember(dest => dest.CenterCapacity, opt => opt.MapFrom(src => src.Capacity))
                 .ForMember(dest => dest.Subjects, opt => opt.MapFrom(src => src.ShiftSubjects));
 

@@ -6,9 +6,6 @@ public sealed class ShiftEntity
     public DateTime? ShiftEndTime { get; set; }
     public int? Capacity { get; set; }
 
-    public Guid CenterId { get; set; }
-    public CenterEntity Center { get; set; }
-
     public Guid AdminId { get; set; }
     public UserEntity Admin { get; set; }
 

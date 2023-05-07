@@ -34,7 +34,7 @@ public sealed class CetShiftsProcess
         {
             CreateMap<ShiftEntity, Response>()
                 .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => $"{src.Admin.FirstName} {src.Admin.LastName}"))
-                .ForMember(dest => dest.CenterName, opt => opt.MapFrom(src => src.Center.Name))
+                //.ForMember(dest => dest.CenterName, opt => opt.MapFrom(src => src.Center.Name))
                 .ForMember(dest => dest.CenterCapacity, opt => opt.MapFrom(src => src.Capacity))
                 .ForMember(dest => dest.Subjects, opt => opt.MapFrom(src => src.ShiftSubjects));
 
@@ -70,9 +70,7 @@ public sealed class CetShiftsProcess
                 var keyword = request.Keyword.Trim();
                 shift = shift.Where(s =>
                     s.Admin.FirstName.Contains(keyword) ||
-                    s.Admin.LastName.Contains(keyword) ||
-                    s.Center.Name.Contains(keyword) ||
-                    s.Center.Description.Contains(keyword));
+                    s.Admin.LastName.Contains(keyword));
             }
 
             return await PagedList<Response>.CreateAsync(
