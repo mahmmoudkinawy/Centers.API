@@ -239,7 +239,7 @@ public static class Seed
 
     }
 
-    public static async Task SeedSubjectsAndCenters(CentersDbContext context)
+    public static async Task SeedSubjectsAndCentersAndExamDates(CentersDbContext context)
     {
         ArgumentNullException.ThrowIfNull(nameof(context));
 
@@ -280,5 +280,16 @@ public static class Seed
 
         context.Centers.AddRange(fakeCenters);
         await context.SaveChangesAsync();
+
+        var fakeExamDates = new Faker<ExamDateEntity>()
+            .RuleFor(s => s.Id, f => Guid.NewGuid())
+            .RuleFor(s => s.Date, f => f.Date.Between(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow.AddYears(1)))
+            .RuleFor(s => s.OpeningDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-2), DateTime.UtcNow.AddYears(2)))
+            .RuleFor(s => s.ClosingDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-3), DateTime.UtcNow.AddYears(3)))
+            .Generate(70);
+
+        context.ExamDates.AddRange(fakeExamDates);
+        await context.SaveChangesAsync();
     }
+
 }

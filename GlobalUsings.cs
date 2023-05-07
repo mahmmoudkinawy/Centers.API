@@ -8,6 +8,7 @@ global using Centers.API.Extensions;
 global using Centers.API.Helpers;
 global using Centers.API.Processes.Account;
 global using Centers.API.Processes.Centers;
+global using Centers.API.Processes.ExamDates;
 global using Centers.API.Processes.Images;
 global using Centers.API.Processes.Otps;
 global using Centers.API.Processes.Questions;

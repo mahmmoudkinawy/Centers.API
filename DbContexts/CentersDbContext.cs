@@ -15,6 +15,7 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
     public DbSet<ChoiceEntity> Choices { get; set; }
     public DbSet<QuestionEntity> Questions { get; set; }
     public DbSet<AnswerEntity> Answers { get; set; }
+    public DbSet<ExamDateEntity> ExamDates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
