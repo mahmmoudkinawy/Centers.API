@@ -6,6 +6,7 @@ public sealed class UpdateUserProcess
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Gender { get; set; }
+        public string? Zone { get; set; }
         public string? PhoneNumber { get; set; }
         public string? NationalId { get; set; }
         public string? Email { get; set; }
@@ -34,6 +35,26 @@ public sealed class UpdateUserProcess
 
             RuleFor(u => u.Gender)
                 .NotEmpty();
+
+            RuleFor(c => c.Zone)
+              .NotEmpty()
+              .NotNull()
+              .Must(zone =>
+              {
+                  var zones = new[]
+                  {
+                        "Abu Dhabi",
+                        "Ajman",
+                        "Dubai",
+                        "Fujairah",
+                        "Ras al-Khaimah",
+                        "Sharjah",
+                        "Umm al-Quwain"
+                  };
+
+                  return zones.Contains(zone, StringComparer.OrdinalIgnoreCase);
+              });
+
 
             //RuleFor(u => u.PhoneNumber)
             //    .Matches("^\\+971\\s*(50|51|52|55|56|2|3|4|6|7|9)\\d{7}$")

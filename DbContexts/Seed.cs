@@ -66,7 +66,9 @@ public static class Seed
                 UserName = "bob@test.com",
                 Gender = "Male",
                 PhoneNumber = "01208534246",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                NationalId = "546546465-5120",
+                Zone = "Abu Dhabi"
             },
             new UserEntity
             {
@@ -77,7 +79,9 @@ public static class Seed
                 UserName = "lisa@test.com",
                 Gender = "Female",
                 PhoneNumber = "01204595826",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                NationalId = "54654-5-5120",
+                Zone = "UAE"
             }
         };
 
@@ -96,7 +100,9 @@ public static class Seed
             UserName = "superadmin@test.com",
             Gender = "Male",
             PhoneNumber = "01208536213",
-            PhoneNumberConfirmed = true
+            PhoneNumberConfirmed = true,
+            NationalId = "3261-52-45-755",
+            Zone = "Fujairah"
         };
 
         await userManager.CreateAsync(superAdminUser, "Pa$$w0rd");
@@ -122,7 +128,8 @@ public static class Seed
                 UserName = "admincenter1@test.com",
                 Gender = "Female",
                 PhoneNumber = "01208534241",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Zone = "Ajman Free Zone"
             },
             new UserEntity
             {
@@ -134,7 +141,8 @@ public static class Seed
                 UserName = "admincenter2@test.com",
                 Gender = "Male",
                 PhoneNumber = "01208534245",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Zone = "Fujairah"
             },
             new UserEntity
             {
@@ -146,7 +154,8 @@ public static class Seed
                 UserName = "admincenter3@test.com",
                 Gender = "Female",
                 PhoneNumber = "01272975803",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Zone = "Ras al-Khaimah"
             },
         };
 
@@ -168,7 +177,8 @@ public static class Seed
                 UserName = "teacher1@test.com",
                 Gender = "Female",
                 PhoneNumber = "01204595822",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Zone="Ras al-Khaimah"
             },
             new UserEntity
             {
@@ -180,7 +190,8 @@ public static class Seed
                 UserName = "teacher2@test.com",
                 Gender = "Male",
                 PhoneNumber = "01271128534",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Zone = "Ras al-Khaimah"
             },
             new UserEntity
             {
@@ -192,7 +203,8 @@ public static class Seed
                 UserName = "teacher3@test.com",
                 Gender = "Male",
                 PhoneNumber = "01271128542",
-                PhoneNumberConfirmed = true
+                PhoneNumberConfirmed = true,
+                Zone = "Umm al-Quwain"
             }
         };
 
@@ -212,17 +224,30 @@ public static class Seed
             UserName = "reviewer@test.com",
             Gender = "Female",
             PhoneNumber = "01104595826",
-            PhoneNumberConfirmed = true
+            PhoneNumberConfirmed = true,
+            Zone = "Sharjah"
         };
 
         await userManager.CreateAsync(reviewerUser, "Pa$$w0rd");
         await userManager.AddToRoleAsync(reviewerUser, Constants.Roles.Reviewer);
+
+        var zones = new[]
+        {
+            "Abu Dhabi",
+            "Ajman",
+            "Dubai",
+            "Fujairah",
+            "Ras al-Khaimah",
+            "Sharjah",
+            "Umm al-Quwain"
+        };
 
         // Seeding some fake users for testing.
         var fakeStudents = new Faker<UserEntity>("ar")
             .RuleFor(u => u.Id, f => Guid.NewGuid())
             .RuleFor(u => u.FirstName, f => f.Person.FirstName)
             .RuleFor(u => u.LastName, f => f.Person.LastName)
+            .RuleFor(s => s.Zone, f => f.Random.ArrayElement(zones))
             .RuleFor(u => u.Email, f => f.Person.Email)
             .RuleFor(u => u.UserName, f => f.Person.UserName)
             .RuleFor(u => u.PhoneNumber, f => f.Person.Phone)

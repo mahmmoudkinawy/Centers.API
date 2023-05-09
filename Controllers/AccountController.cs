@@ -88,7 +88,7 @@ public sealed class AccountController : ControllerBase
     ///     Pa$$w0rd
     ///     --boundary
     ///     Content-Disposition: form-data; name="hasDisability"
-    ///
+    ///    
     ///     true
     ///     --boundary
     ///     Content-Disposition: form-data; name="disability"; filename="myDisability.jpg"
@@ -101,6 +101,10 @@ public sealed class AccountController : ControllerBase
     ///     [binary data]
     ///     --boundary--
     ///
+    ///     Ajman
+    ///     Content-Disposition: form-data; name="zone"
+    ///     --boundary--
+    ///     
     /// </remarks>
     /// <response code="200">Returns the newly created user full name and token.</response>
     /// <response code="400">If the item is got validation errors.</response>
