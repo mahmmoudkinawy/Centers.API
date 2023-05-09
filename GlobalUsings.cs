@@ -46,3 +46,6 @@ global using System.Text.Json;
 global using Twilio;
 global using Twilio.Rest.Api.V2010.Account;
 global using IndexAttribute = CsvHelper.Configuration.Attributes.IndexAttribute;
+global using RestSharp;
+global using RestSharp.Authenticators;
+

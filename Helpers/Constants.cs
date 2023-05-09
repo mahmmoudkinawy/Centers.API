@@ -12,6 +12,14 @@ public static class Constants
         public const string MustBeSuperAdmin = "MustBeSuperAdmin";
     }
 
+    public sealed class MailgunSettings
+    {
+        public const string ApiKey = "MailgunSettings:ApiKey";
+        public const string ApiUrl = "MailgunSettings:ApiUrl";
+        public const string SandBoxDomain = "MailgunSettings:SandBoxDomain";
+        public const string From = "MailgunSettings:From";
+    }
+
     public sealed class CloudinarySettings
     {
         public const string CloudName = "CloudinarySettings:CloudName";

@@ -11,6 +11,8 @@ public static class ApplicationServiceExtensions
 
         services.AddTransient<ISmsService, SmsService>();
 
+        services.AddTransient<IEmailSender, EmailSender>();
+
         services.Configure<TwilioSettings>(config.GetSection("TwilioSettings"));
 
         services.AddScoped<IOtpService, OtpService>();
