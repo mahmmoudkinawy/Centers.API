@@ -12,7 +12,6 @@ public sealed class CreateCenterProcess
 
         public DateTime? ShiftStartTime { get; set; } = DateTime.UtcNow.Date.AddHours(10); // Starting time of the first shift
         public TimeSpan? ShiftDuration { get; set; } = TimeSpan.FromHours(2); // Duration of each shift
-        public int ShiftCount { get; set; } = 4; // Number of shifts to create
     }
 
     public sealed class Response { }
@@ -110,7 +109,7 @@ public sealed class CreateCenterProcess
             var shiftStart = request.ShiftStartTime ?? DateTime.UtcNow;
             var shiftDuration = request.ShiftDuration ?? TimeSpan.FromHours(2);
 
-            for(var i = 0; i < request.ShiftCount; i++)
+            for (var i = 0; i < 4; i++)
             {
                 var shift = new ShiftEntity
                 {
