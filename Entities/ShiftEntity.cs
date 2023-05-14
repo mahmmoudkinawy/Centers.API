@@ -5,10 +5,8 @@ public sealed class ShiftEntity
     public DateTime? ShiftStartTime { get; set; }
     public DateTime? ShiftEndTime { get; set; }
     public int? Capacity { get; set; }
+    public bool? IsEnabled { get; set; }
 
-    public Guid AdminId { get; set; }
-    public UserEntity Admin { get; set; }
-
-    // Relationship until now from one side
-    public ICollection<ShiftSubjectEntity> ShiftSubjects { get; set; } = new List<ShiftSubjectEntity>();
+    public Guid CenterId { get; set; }
+    public CenterEntity Center { get; set; }
 }

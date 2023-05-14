@@ -46,19 +46,8 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .Property(u => u.IsActive)
             .HasDefaultValue(true);
 
-        builder.Entity<ShiftEntity>()
-            .HasOne(a => a.Admin)
-            .WithMany()
-            .HasForeignKey(k => k.AdminId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.Entity<ShiftSubjectEntity>()
             .HasKey(ss => new { ss.ShiftId, ss.SubjectId });
-
-        builder.Entity<ShiftSubjectEntity>()
-            .HasOne(ss => ss.Shift)
-            .WithMany(s => s.ShiftSubjects)
-            .HasForeignKey(ss => ss.ShiftId);
 
         builder.Entity<ShiftSubjectEntity>()
             .HasOne(ss => ss.Subject)
@@ -94,6 +83,12 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .HasMany(i => i.Images)
             .WithOne(q => q.Question)
             .HasForeignKey(i => i.QuestionId);
+
+        builder.Entity<ShiftEntity>()
+            .HasOne(c => c.Center)
+            .WithMany(s => s.Shifts)
+            .HasForeignKey(s => s.CenterId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ApplyUtcDateTimeConverter();
     }

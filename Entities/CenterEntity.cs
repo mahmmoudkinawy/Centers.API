@@ -8,4 +8,6 @@ public sealed class CenterEntity
     public string? LocationUrl { get; set; }
     public int? Capacity { get; set; }
     public bool? IsEnabled { get; set; }
+
+    public ICollection<ShiftEntity> Shifts { get; set; } = new List<ShiftEntity>();
 }

@@ -9,6 +9,10 @@ public sealed class CreateCenterProcess
         public string? LocationUrl { get; set; }
         public int? Capacity { get; set; }
         public bool? IsEnabled { get; set; }
+
+        public DateTime? ShiftStartTime { get; set; } = DateTime.UtcNow.Date.AddHours(10); // Starting time of the first shift
+        public TimeSpan? ShiftDuration { get; set; } = TimeSpan.FromHours(2); // Duration of each shift
+        public int ShiftCount { get; set; } = 4; // Number of shifts to create
     }
 
     public sealed class Response { }
@@ -102,6 +106,26 @@ public sealed class CreateCenterProcess
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
             var center = _mapper.Map<CenterEntity>(request);
+
+            var shiftStart = request.ShiftStartTime ?? DateTime.UtcNow;
+            var shiftDuration = request.ShiftDuration ?? TimeSpan.FromHours(2);
+
+            for(var i = 0; i < request.ShiftCount; i++)
+            {
+                var shift = new ShiftEntity
+                {
+                    Id = Guid.NewGuid(),
+                    ShiftStartTime = shiftStart,
+                    ShiftEndTime = shiftStart.Add(shiftDuration),
+                    Center = center,
+                    Capacity = 20,  // Shift Capacity not center Capacity.
+                    IsEnabled = false
+                };
+
+                center.Shifts.Add(shift);
+
+                shiftStart = shift.ShiftStartTime.Value.AddHours(2);
+            }
 
             _context.Centers.Add(center);
 

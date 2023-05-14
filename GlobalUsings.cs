@@ -12,7 +12,6 @@ global using Centers.API.Processes.ExamDates;
 global using Centers.API.Processes.Images;
 global using Centers.API.Processes.Otps;
 global using Centers.API.Processes.Questions;
-global using Centers.API.Processes.Shifts;
 global using Centers.API.Processes.Subjects;
 global using Centers.API.Processes.Users;
 global using Centers.API.Services;
@@ -48,4 +47,5 @@ global using Twilio.Rest.Api.V2010.Account;
 global using IndexAttribute = CsvHelper.Configuration.Attributes.IndexAttribute;
 global using RestSharp;
 global using RestSharp.Authenticators;
+global using Microsoft.AspNetCore.SignalR;
 
