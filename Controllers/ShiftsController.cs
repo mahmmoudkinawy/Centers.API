@@ -1,4 +1,6 @@
-﻿namespace Centers.API.Controllers;
+﻿using Centers.API.Processes.Shifts;
+
+namespace Centers.API.Controllers;
 
 [Route("api/v{version:apiVersion}/shifts")]
 [ApiController]
@@ -158,49 +160,43 @@ public sealed class ShiftsController : ControllerBase
     //}
 
     /// <summary>
-    /// Update shift endpoint.
+    /// Updates all the shifts time.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
-    /// <returns>Returns not content.</returns>
+    /// <returns>Returns no content.</returns>
     /// <remarks>
     /// Sample request:
     ///
-    ///     POST /shifts/808e2447-bc6e-cc57-e2fb-07aa702a94e0
-    ///     {
-    ///         "shiftStartTime": "2023-05-01T17:58:05.820Z",
-    ///         "shiftEndTime": "2023-05-08T17:58:05.820Z",
-    ///         "centerId": "808e2447-bc6e-cc57-e2fb-07aa702a94e0",
-    ///         "capacity": 348,
-    ///         "adminId": "2fb8d84f-f9da-4ed8-b5d2-2f68a049b1e7",
-    ///         "subjectIds": [
-    ///             "a3cec1a5-ec78-1615-1d7d-02f1aa2a9b29"
-    ///         ]
-    ///      }
+    ///     PUT /update-shifts-time/
+    ///         {
+    ///             "shiftStartTime": "2023-05-01T17:58:05.82Z",
+    ///             "shiftDuration": "00:30:00
+    ///         }
     /// </remarks>
-    /// <response code="204">Returns not content.</response>
-    /// <response code="400">Validation errors.</response>
+    /// <response code="204">Success and returns no content.</response>
+    /// <response code="404">No shifts to update.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
-    //[HttpPut("{shiftId:guid}")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-    //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    //[ProducesResponseType(StatusCodes.Status403Forbidden)]
-    //public async Task<IActionResult> UpdateShift(
-    //    [FromBody] UpdateShiftProcess.Request request,
-    //    CancellationToken cancellationToken)
-    //{
-    //    var response = await _mediator.Send(
-    //        request,
-    //        cancellationToken);
+    [HttpPut("update-shifts-time")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateShiftsTime(
+        [FromBody] UpdateShiftTimeProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
 
-    //    if (!response.IsSuccess)
-    //    {
-    //        return BadRequest(response.Errors);
-    //    }
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
 
-    //    return NoContent();
-    //}
+        return NoContent();
+    }
 
 }
