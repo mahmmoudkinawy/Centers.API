@@ -1,0 +1,75 @@
+﻿namespace Centers.API.Processes.Shifts;
+public sealed class UpdateShiftStatusForCenterProcess
+{
+    public sealed class Request : IRequest<Result<Response>>
+    {
+        public bool? IsEnabled { get; set; }
+    }
+
+    public sealed class Response { }
+
+    public sealed class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+            RuleFor(r => r.IsEnabled)
+                .NotNull()
+                .NotEmpty();
+        }
+    }
+
+    public sealed class Handler : IRequestHandler<Request, Result<Response>>
+    {
+        private readonly CentersDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public Handler(
+            CentersDbContext context,
+            IHttpContextAccessor httpContextAccessor)
+        {
+            _context = context ??
+                throw new ArgumentNullException(nameof(context));
+            _httpContextAccessor = httpContextAccessor ??
+                throw new ArgumentNullException(nameof(httpContextAccessor));
+        }
+
+        public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
+        {
+            var requestRouteQuery = _httpContextAccessor.HttpContext?.GetRouteData();
+
+            var centerIdFromRoute = requestRouteQuery!.Values["centerId"];
+            var shiftIdFromRoute = requestRouteQuery!.Values["shiftId"];
+
+            var centerId = Guid.Parse(centerIdFromRoute.ToString());
+            var shiftId = Guid.Parse(shiftIdFromRoute.ToString());
+
+            if (centerId == shiftId)
+            {
+                return Result<Response>.Failure(
+                new List<string> { "We're sorry, but the shift with the given ID does not exist or the shift does not belong to the center. Please check the ID and try again." });
+            }
+
+            var shift = await _context.Shifts
+                .FirstOrDefaultAsync(s => s.Id == shiftId && s.CenterId == centerId,
+                    cancellationToken: cancellationToken);
+
+            if (shift is null)
+            {
+                return Result<Response>.Failure(
+                new List<string> { "We're sorry, but the shift with the given ID does not exist or the shift does not belong to the center. Please check the ID and try again." });
+            }
+
+            shift.IsEnabled = request.IsEnabled;
+
+            if (await _context.SaveChangesAsync() > 0)
+            {
+                return Result<Response>.Success(new Response { });
+            }
+
+            return Result<Response>.Failure(
+          new List<string> { "We're sorry, but there was an error updating the shift status to the database. Please try again later." });
+
+        }
+    }
+
+}
