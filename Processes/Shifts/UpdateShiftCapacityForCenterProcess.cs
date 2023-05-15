@@ -39,7 +39,7 @@ public sealed class UpdateShiftCapacityForCenterProcess
                         return false;
                     }
 
-                    return center.Capacity <= capacity.Value;
+                    return capacity.Value <= center.Capacity;
                 })
                 .WithMessage("Shift capacity can not exceed the center capacity.");
         }
@@ -82,7 +82,7 @@ public sealed class UpdateShiftCapacityForCenterProcess
 
             shift.Capacity = request.Capacity;
 
-            if (await _context.SaveChangesAsync() > 0)
+            if (await _context.SaveChangesAsync(cancellationToken) > 0)
             {
                 return Result<Response>.Success(new Response { });
             }
