@@ -16,6 +16,7 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
     public DbSet<QuestionEntity> Questions { get; set; }
     public DbSet<AnswerEntity> Answers { get; set; }
     public DbSet<ExamDateEntity> ExamDates { get; set; }
+    public DbSet<ExamDateSubject> ExamDateSubjects { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -89,6 +90,24 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .WithMany(s => s.Shifts)
             .HasForeignKey(s => s.CenterId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ExamDateSubject>()
+            .HasKey(es => new { es.ExamDateId, es.SubjectId, es.CenterId });
+
+        builder.Entity<ExamDateSubject>()
+            .HasOne(es => es.ExamDate)
+            .WithMany(e => e.ExamDateSubjects)
+            .HasForeignKey(es => es.ExamDateId);
+
+        builder.Entity<ExamDateSubject>()
+            .HasOne(es => es.Subject)
+            .WithMany(e => e.ExamDateSubjects)
+            .HasForeignKey(es => es.SubjectId);
+
+        builder.Entity<ExamDateSubject>()
+            .HasOne(es => es.Center)
+            .WithMany()
+            .HasForeignKey(es => es.CenterId);
 
         builder.ApplyUtcDateTimeConverter();
     }

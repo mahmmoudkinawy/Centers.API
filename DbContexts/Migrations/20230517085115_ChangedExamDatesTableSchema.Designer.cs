@@ -4,6 +4,7 @@ using Centers.API.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Centers.API.DbContexts.Migrations
 {
     [DbContext(typeof(CentersDbContext))]
-    partial class CentersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230517085115_ChangedExamDatesTableSchema")]
+    partial class ChangedExamDatesTableSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,6 +119,9 @@ namespace Centers.API.DbContexts.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CenterId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("ClosingDate")
                         .HasColumnType("datetime2");
 
@@ -125,29 +131,16 @@ namespace Centers.API.DbContexts.Migrations
                     b.Property<DateTime?>("OpeningDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("ExamDates");
-                });
-
-            modelBuilder.Entity("Centers.API.Entities.ExamDateSubject", b =>
-                {
-                    b.Property<Guid>("ExamDateId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CenterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ExamDateId", "SubjectId", "CenterId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CenterId");
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("ExamDateSubjects");
+                    b.ToTable("ExamDates");
                 });
 
             modelBuilder.Entity("Centers.API.Entities.ImageEntity", b =>
@@ -526,29 +519,21 @@ namespace Centers.API.DbContexts.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("Centers.API.Entities.ExamDateSubject", b =>
+            modelBuilder.Entity("Centers.API.Entities.ExamDateEntity", b =>
                 {
                     b.HasOne("Centers.API.Entities.CenterEntity", "Center")
-                        .WithMany()
+                        .WithMany("ExamDates")
                         .HasForeignKey("CenterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Centers.API.Entities.ExamDateEntity", "ExamDate")
-                        .WithMany("ExamDateSubjects")
-                        .HasForeignKey("ExamDateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Centers.API.Entities.SubjectEntity", "Subject")
-                        .WithMany("ExamDateSubjects")
+                        .WithMany("ExamDates")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Center");
-
-                    b.Navigation("ExamDate");
 
                     b.Navigation("Subject");
                 });
@@ -685,6 +670,8 @@ namespace Centers.API.DbContexts.Migrations
 
             modelBuilder.Entity("Centers.API.Entities.CenterEntity", b =>
                 {
+                    b.Navigation("ExamDates");
+
                     b.Navigation("Shifts");
                 });
 
@@ -692,11 +679,6 @@ namespace Centers.API.DbContexts.Migrations
                 {
                     b.Navigation("Owner")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Centers.API.Entities.ExamDateEntity", b =>
-                {
-                    b.Navigation("ExamDateSubjects");
                 });
 
             modelBuilder.Entity("Centers.API.Entities.QuestionEntity", b =>
@@ -708,7 +690,7 @@ namespace Centers.API.DbContexts.Migrations
 
             modelBuilder.Entity("Centers.API.Entities.SubjectEntity", b =>
                 {
-                    b.Navigation("ExamDateSubjects");
+                    b.Navigation("ExamDates");
                 });
 
             modelBuilder.Entity("Centers.API.Entities.UserEntity", b =>

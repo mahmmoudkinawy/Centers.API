@@ -277,7 +277,7 @@ public static class Seed
             .RuleFor(s => s.Id, f => Guid.NewGuid())
             .RuleFor(s => s.Name, f => f.Hacker.Verb())
             .RuleFor(s => s.Description, f => f.Lorem.Paragraph(4))
-            .Generate(150);
+            .Generate(50);
 
         context.Subjects.AddRange(fakeSubjects);
         await context.SaveChangesAsync();
@@ -301,7 +301,7 @@ public static class Seed
             .RuleFor(s => s.Gender, f => f.Person.Gender.ToString())
             .RuleFor(s => s.LocationUrl, f => f.Person.Avatar)
             .RuleFor(s => s.Zone, f => f.Random.ArrayElement(zones))
-            .Generate(160);
+            .Generate(50);
 
         context.Centers.AddRange(fakeCenters);
         await context.SaveChangesAsync();
@@ -311,7 +311,7 @@ public static class Seed
             .RuleFor(s => s.Date, f => f.Date.Between(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow.AddYears(1)))
             .RuleFor(s => s.OpeningDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-2), DateTime.UtcNow.AddYears(2)))
             .RuleFor(s => s.ClosingDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-3), DateTime.UtcNow.AddYears(3)))
-            .Generate(70);
+            .Generate(75);
 
         context.ExamDates.AddRange(fakeExamDates);
         await context.SaveChangesAsync();
