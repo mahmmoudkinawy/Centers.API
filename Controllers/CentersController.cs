@@ -53,6 +53,43 @@ public sealed class CentersController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Get center with shifts by id endpoint.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns the center with shifts</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /centers/5e7c6724-a3e4-4916-ff73-08db45b55673/with-shifts
+    /// </remarks>
+    /// <response code="200">Returns the center with shifts via the given id.</response>
+    /// <response code="401">User does not exist.</response>    
+    /// <response code="404">No center matches this id.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [HttpGet("{centerId}/with-shifts")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCenterWithShiftsById(
+        [FromRoute] Guid centerId,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetCenterWithShiftsByCenterIdProcess.Request
+            {
+                CenterId = centerId
+            }, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return NotFound(response.Errors);
+        }
+
+        return Ok(response.Value);
+    }
 
     /// <summary>
     /// Get center by id endpoint.
@@ -104,11 +141,12 @@ public sealed class CentersController : ControllerBase
     /// 
     ///     POST /centers
     ///     {
-    ///         "name": "Ibn Elhithm",
-    ///         "capacity": 5000,
-    ///         "description": "Great center",
-    ///         "openingDate": "2023-05-01T08:00:00Z",
-    ///         "closingDate": "2023-10-01T08:00:00Z"
+    ///         "name": "Center",
+    ///         "gender": "Male",
+    ///         "zone": "Ras al-Khaimah",
+    ///         "locationUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1001.jpg",
+    ///         "capacity": 50,
+    ///         "isEnabled": true
     ///     }
     /// </remarks>
     /// <response code="204">Returns not content.</response>
@@ -147,11 +185,12 @@ public sealed class CentersController : ControllerBase
     ///
     ///     PUT /centers/d36e0fda-47f3-4ace-ff72-08db45b55673
     ///     {
-    ///         "name": "Ibn Elhithm updated",
-    ///         "capacity": 236,
-    ///         "description": "Great center updated",
-    ///         "openingDate": "2023-05-01T08:00:00Z",
-    ///         "closingDate": "2023-10-01T08:00:00Z"
+    ///         "name": "Center update",
+    ///         "gender": "Female",
+    ///         "zone": "Ras al-Khaimah",
+    ///         "locationUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1001.jpg",
+    ///         "capacity": 25,
+    ///         "isEnabled": false
     ///     }
     /// </remarks>
     /// <response code="204">Returns not content.</response>
