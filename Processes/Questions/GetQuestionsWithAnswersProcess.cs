@@ -14,6 +14,7 @@ public sealed class GetQuestionsWithAnswersProcess
     {
         public Guid Id { get; set; }
         public string QuestionText { get; set; }
+        public DateTime CreatedAt { get; set; }
         public string Type { get; set; }
         public ICollection<ChoiceResponse> Choices { get; set; } = new List<ChoiceResponse>();
         public string? AnswerText { get; set; }

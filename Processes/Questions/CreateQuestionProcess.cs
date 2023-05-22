@@ -107,6 +107,7 @@ public sealed class CreateQuestionProcess
             {
                 Id = Guid.NewGuid(),
                 OwnerId = currentUserId,
+                CreatedAt = DateTime.UtcNow,
                 Text = request.Text,
                 Type = request.Type.ToString()
             };

@@ -88,6 +88,7 @@ public sealed class UploadQuestionsByFileProcess
                 {
                     Id = questionIdToCreate,
                     OwnerId = currentUserId,
+                    CreatedAt = DateTime.UtcNow,
                     Type = request.Type.ToString(),
                 };
 

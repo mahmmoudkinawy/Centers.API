@@ -320,7 +320,7 @@ public static class Seed
 
     }
 
-    public static async Task SeedSubjectsAndCentersAndExamDates(CentersDbContext context)
+    public static async Task SeedSubjectsAndExamDates(CentersDbContext context)
     {
         ArgumentNullException.ThrowIfNull(nameof(context));
 

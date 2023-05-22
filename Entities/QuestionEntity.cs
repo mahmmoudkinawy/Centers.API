@@ -4,6 +4,8 @@ public sealed class QuestionEntity
     public Guid Id { get; set; }
     public string? Text { get; set; }
     public string? Type { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    public bool? IsApproved { get; set; }
 
     public Guid OwnerId { get; set; }
     public UserEntity Owner { get; set; }

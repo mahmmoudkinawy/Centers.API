@@ -115,6 +115,10 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .HasForeignKey<CenterEntity>(c => c.OwnerId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<QuestionEntity>()
+            .Property(q => q.IsApproved)
+            .HasDefaultValue(false);
+
         builder.ApplyUtcDateTimeConverter();
     }
 
