@@ -1,4 +1,6 @@
-﻿namespace Centers.API.Processes.Subjects;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace Centers.API.Processes.Subjects;
 public sealed class UpdateCenterProcess
 {
     public sealed class Request : IRequest<Result<Response>>
@@ -9,6 +11,7 @@ public sealed class UpdateCenterProcess
         public string? LocationUrl { get; set; }
         public int? Capacity { get; set; }
         public bool? IsEnabled { get; set; }
+        public Guid? OwnerId { get; set; }
     }
 
     public sealed class Response { }
@@ -23,8 +26,13 @@ public sealed class UpdateCenterProcess
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        private readonly CentersDbContext _context;
+
+        public Validator(CentersDbContext context)
         {
+            _context = context ??
+                throw new ArgumentNullException(nameof(context));
+
             RuleFor(c => c.Name)
                 .MaximumLength(100)
                 .NotEmpty()
@@ -80,6 +88,19 @@ public sealed class UpdateCenterProcess
                 .NotEmpty()
                 .NotNull();
 
+            RuleFor(c => c.OwnerId)
+                .Must(ownerId =>
+                {
+                    var isCenterAdmin = _context.UserRoles
+                        .Any(ur => ur.UserId == ownerId && _context.Roles
+                            .Any(r => r.Id == ur.RoleId && r.Name == Constants.Roles.CenterAdmin));
+
+                    var isAdminInOtherCenter = _context.Centers
+                        .Any(c => c.OwnerId == ownerId);
+
+                    return isCenterAdmin && !isAdminInOtherCenter;
+                })
+                .WithMessage("The OwnerId must belong to the Center Admin role, and a user can only be associated as an admin with one center at a time. The provided ownerId is either not associated with the Center Admin role or is already associated with another center as an admin.");
         }
     }
 

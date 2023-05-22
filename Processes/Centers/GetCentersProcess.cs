@@ -19,13 +19,15 @@ public sealed class GetCentersProcess
         public string LocationUrl { get; set; }
         public int Capacity { get; set; }
         public bool IsEnabled { get; set; }
+        public string OwnerName { get; set; }
     }
 
     public sealed class Mapper : Profile
     {
         public Mapper()
         {
-            CreateMap<CenterEntity, Response>();
+            CreateMap<CenterEntity, Response>()
+                .ForMember(dest => dest.OwnerName, opt => opt.MapFrom(src => $"{src.Owner.FirstName} {src.Owner.LastName}"));
         }
     }
 

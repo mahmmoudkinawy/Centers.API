@@ -89,7 +89,20 @@ public sealed class CreateUserProcess
                 .NotEmpty();
 
             RuleFor(u => u.Role)
-                .NotEmpty();
+              .NotEmpty()
+              .NotNull()
+              .Must(role =>
+              {
+                  var roles = new[]
+                  {
+                      Constants.Roles.CenterAdmin,
+                      Constants.Roles.Reviewer,
+                      Constants.Roles.Student,
+                      Constants.Roles.Teacher
+                  };
+
+                  return roles.Contains(role);
+              });
         }
     }
 

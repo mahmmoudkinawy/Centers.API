@@ -72,8 +72,8 @@ public sealed class UsersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetUsers(
-            [FromQuery] UserParams userParams,
-            CancellationToken cancellationToken)
+        [FromQuery] UserParams userParams,
+        CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
             new GetUsersProcess.Request
@@ -108,6 +108,7 @@ public sealed class UsersController : ControllerBase
     ///         "firstName": "Sameh",
     ///         "lastName": "Yossry",
     ///         "gender": "Male",
+    ///         "zone": "Sharjah",
     ///         "phoneNumber": "+201208534246",
     ///         "nationalId": "789-1234-5678901-2",
     ///         "email": "sameh.yossry@test.com",
@@ -153,12 +154,13 @@ public sealed class UsersController : ControllerBase
     ///     {
     ///         "firstName": "Sameh updated",
     ///         "lastName": "Yossry updated",
-    ///         "gender": "Male",
-    ///         "phoneNumber": "+201208534246",
-    ///         "nationalId": "789-1234-5678901-2",
-    ///         "email": "sameh.yossry@test.com",
+    ///         "gender": "Female",
+    ///         "zone": "Sharjah",
+    ///         "phoneNumber": "+012554362619",
+    ///         "nationalId": "789-1561-545",
+    ///         "email": "sameh.yossry.updated@test.com",
     ///         "password": "Pa$$w0rd",
-    ///         "isPhoneNumberConfirmed": true,
+    ///         "isPhoneNumberConfirmed": false,
     ///         "role": "Student"
     ///     }
     /// </remarks>

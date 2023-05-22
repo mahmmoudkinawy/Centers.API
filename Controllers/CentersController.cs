@@ -146,7 +146,8 @@ public sealed class CentersController : ControllerBase
     ///         "zone": "Ras al-Khaimah",
     ///         "locationUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1001.jpg",
     ///         "capacity": 50,
-    ///         "isEnabled": true
+    ///         "isEnabled": true,
+    ///         "ownerId": "340b60b6-4b03-48cc-848a-0bb896f77842"
     ///     }
     /// </remarks>
     /// <response code="204">Returns not content.</response>
@@ -190,7 +191,8 @@ public sealed class CentersController : ControllerBase
     ///         "zone": "Ras al-Khaimah",
     ///         "locationUrl": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/1001.jpg",
     ///         "capacity": 25,
-    ///         "isEnabled": false
+    ///         "isEnabled": false,
+    ///         "ownerId": "622ac7e5-66e0-45e0-9496-7c7b7f7774ad"
     ///     }
     /// </remarks>
     /// <response code="204">Returns not content.</response>

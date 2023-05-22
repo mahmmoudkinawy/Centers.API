@@ -15,13 +15,15 @@ public sealed class GetCenterByIdProcess
         public string LocationUrl { get; set; }
         public int Capacity { get; set; }
         public bool IsEnabled { get; set; }
+        public string OwnerName { get; set; }
     }
 
     public sealed class Mapper : Profile
     {
         public Mapper()
         {
-            CreateMap<CenterEntity, Response>();
+            CreateMap<CenterEntity, Response>()
+                .ForMember(dest => dest.OwnerName, opt => opt.MapFrom(src => $"{src.Owner.FirstName} {src.Owner.LastName}"));
         }
     }
 
@@ -43,7 +45,9 @@ public sealed class GetCenterByIdProcess
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
             var center = await _context.Centers
-                .FindAsync(new object?[] { request.CenterId }, cancellationToken: cancellationToken);
+                .ProjectTo<Response>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(c => c.Id == request.CenterId, 
+                    cancellationToken: cancellationToken);
 
             if (center is null)
             {
@@ -53,7 +57,7 @@ public sealed class GetCenterByIdProcess
                 });
             }
 
-            return Result<Response>.Success(_mapper.Map<Response>(center));
+            return Result<Response>.Success(center);
         }
     }
 

@@ -85,13 +85,26 @@ public sealed class UpdateUserProcess
                 .EmailAddress()
                 .NotEmpty();
 
-            RuleFor(u => u.NationalId)
-                .Matches("^784-(19|20)\\d{2}-\\d{7}-\\d{1}$")
-                .WithMessage("Your National Id does not appear to be valid for UAE.")
-                .NotEmpty();
+            //RuleFor(u => u.NationalId)
+            //    .Matches("^784-(19|20)\\d{2}-\\d{7}-\\d{1}$")
+            //    .WithMessage("Your National Id does not appear to be valid for UAE.")
+            //    .NotEmpty();
 
             RuleFor(u => u.Role)
-                .NotEmpty();
+                .NotEmpty()
+                .NotNull()
+                .Must(role =>
+                {
+                    var roles = new[]
+                    {
+                        Constants.Roles.CenterAdmin,
+                        Constants.Roles.Reviewer,
+                        Constants.Roles.Student,
+                        Constants.Roles.Teacher
+                    };
+
+                    return roles.Contains(role);
+                });
         }
     }
 
