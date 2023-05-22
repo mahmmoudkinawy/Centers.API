@@ -12,6 +12,7 @@ global using Centers.API.Processes.ExamDates;
 global using Centers.API.Processes.Images;
 global using Centers.API.Processes.Otps;
 global using Centers.API.Processes.Questions;
+global using Centers.API.Processes.Reviewers;
 global using Centers.API.Processes.Shifts;
 global using Centers.API.Processes.Subjects;
 global using Centers.API.Processes.Users;

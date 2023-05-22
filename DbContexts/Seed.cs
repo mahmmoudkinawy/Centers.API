@@ -108,12 +108,7 @@ public static class Seed
         await userManager.CreateAsync(superAdminUser, "Pa$$w0rd");
         await userManager.AddToRolesAsync(superAdminUser, new[]
         {
-            // Will be modified later on.
-            Constants.Roles.SuperAdmin,
-            Constants.Roles.CenterAdmin,
-            Constants.Roles.Reviewer,
-            Constants.Roles.Teacher,
-            Constants.Roles.Student
+            Constants.Roles.SuperAdmin
         });
 
         var centerAdminUsers = new List<UserEntity>

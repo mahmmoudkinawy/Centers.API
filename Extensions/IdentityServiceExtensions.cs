@@ -53,6 +53,11 @@ public static class IdentityServiceExtensions
                 opts.RequireClaim(ClaimTypes.Role, Constants.Roles.CenterAdmin);
             });
 
+            builder.AddPolicy(Constants.Policies.MustBeReviewer, opts =>
+            {
+                opts.RequireClaim(ClaimTypes.Role, Constants.Roles.Reviewer);
+            });
+
         });
 
         return services;

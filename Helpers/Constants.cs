@@ -11,6 +11,7 @@ public static class Constants
         public const string MustBeTeacher = "MustBeTeacher";
         public const string MustBeSuperAdmin = "MustBeSuperAdmin";
         public const string MustBeCenterAdmin = "MustBeCenterAdmin";
+        public const string MustBeReviewer = "MustBeReviewer";
     }
 
     public sealed class MailgunSettings

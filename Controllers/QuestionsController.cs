@@ -88,7 +88,7 @@ public sealed class QuestionsController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     GET /questions/current-user-question-with-answers/f969f33a-651d-46fb-9362-aa58daa14c98
+    ///     GET /questions/f969f33a-651d-46fb-9362-aa58daa14c98/current-user-question-with-answers
     ///     [
     ///         {
     ///             "id": "f969f33a-651d-46fb-9362-aa58daa14c98",
@@ -104,7 +104,7 @@ public sealed class QuestionsController : ControllerBase
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
     [Authorize(Policy = Constants.Policies.MustBeTeacher)]
-    [HttpGet("current-user-question-with-answers/{questionId}")]
+    [HttpGet("{questionId}/current-user-question-with-answers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -266,6 +266,46 @@ public sealed class QuestionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> UpdateQuestion(
       [FromForm] UpdateQuestionProcess.Request request,
+      CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Updates a question status as approved or not.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns not content.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     PUT /questions/ce55c93a-764d-4b54-8503-de419aa641d3/set-question-status
+    ///     {
+    ///         "isApproved": true
+    ///     }
+    /// </remarks>
+    /// <response code="204">Returns not content.</response>
+    /// <response code="400">Validation errors.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeReviewer)]
+    [HttpPut("{questionId:guid}/set-question-status")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateQuestionStatus(
+      [FromBody] UpdateQuestionStatusProcess.Request request,
       CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
