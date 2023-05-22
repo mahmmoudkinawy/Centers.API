@@ -9,5 +9,8 @@ public sealed class CenterEntity
     public int? Capacity { get; set; }
     public bool? IsEnabled { get; set; }
 
+    public UserEntity? Owner { get; set; }
+    public Guid? OwnerId { get; set; }
+
     public ICollection<ShiftEntity> Shifts { get; set; } = new List<ShiftEntity>();
 }

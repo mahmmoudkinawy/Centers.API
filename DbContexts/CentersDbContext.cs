@@ -109,6 +109,12 @@ public sealed class CentersDbContext : IdentityDbContext<UserEntity, RoleEntity,
             .WithMany()
             .HasForeignKey(es => es.CenterId);
 
+        builder.Entity<CenterEntity>()
+            .HasOne(c => c.Owner)
+            .WithOne(u => u.Center)
+            .HasForeignKey<CenterEntity>(c => c.OwnerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.ApplyUtcDateTimeConverter();
     }
 

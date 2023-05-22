@@ -11,6 +11,8 @@ public sealed class UserEntity : IdentityUser<Guid>
     public Guid? DisabilityId { get; set; }
     public DisabilityEntity? Disability { get; set; }
 
+    public CenterEntity? Center { get; set; }
+
     public ICollection<ImageEntity> Images { get; set; } = new List<ImageEntity>();
     public ICollection<QuestionEntity> Questions { get; set; } = new List<QuestionEntity>();
 

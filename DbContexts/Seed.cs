@@ -129,7 +129,17 @@ public static class Seed
                 Gender = "Female",
                 PhoneNumber = "01208534241",
                 PhoneNumberConfirmed = true,
-                Zone = "Ajman Free Zone"
+                Zone = "Ajman Free Zone",
+                Center = new CenterEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Capacity = 50,
+                    Gender = "Both",
+                    IsEnabled = true,
+                    LocationUrl = "https://github.com/mahmmoud",
+                    Zone = "Abu Dhabi",
+                    Name = "Ibn Elhithem"
+                }
             },
             new UserEntity
             {
@@ -142,7 +152,17 @@ public static class Seed
                 Gender = "Male",
                 PhoneNumber = "01208534245",
                 PhoneNumberConfirmed = true,
-                Zone = "Fujairah"
+                Zone = "Fujairah",
+                Center = new CenterEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Capacity = 55,
+                    Gender = "Male",
+                    IsEnabled = true,
+                    LocationUrl = "https://facebook.com/asdpqwdqwdqwd",
+                    Zone = "Ajman",
+                    Name = "Alrahma"
+                }
             },
             new UserEntity
             {
@@ -155,8 +175,44 @@ public static class Seed
                 Gender = "Female",
                 PhoneNumber = "01272975803",
                 PhoneNumberConfirmed = true,
-                Zone = "Ras al-Khaimah"
+                Zone = "Ras al-Khaimah",
+                Center = new CenterEntity
+                {
+                    Id = Guid.NewGuid(),
+                    Capacity = 150,
+                    Gender = "Female",
+                    IsEnabled = true,
+                    LocationUrl = "https://twitter.com/asdmqwdmqmpwdqw",
+                    Zone = "Fujairah",
+                    Name = "Loma By"
+                }
             },
+            new UserEntity
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Admin",
+                LastName = "Center 4",
+                NationalId = "1212-56331-552",
+                Email = "admincenter4@test.com",
+                UserName = "admincenter4@test.com",
+                Gender = "Male",
+                PhoneNumber = "012045958236",
+                PhoneNumberConfirmed = true,
+                Zone = "Dubai"
+            },
+            new UserEntity
+            {
+                Id = Guid.NewGuid(),
+                FirstName = "Admin",
+                LastName = "Center 5",
+                NationalId = "515-25565-45",
+                Email = "admincenter5@test.com",
+                UserName = "admincenter5@test.com",
+                Gender = "Female",
+                PhoneNumber = "012085413112",
+                PhoneNumberConfirmed = true,
+                Zone = "Sharjah"
+            }
         };
 
         foreach (var centerAdminUser in centerAdminUsers)
@@ -254,7 +310,7 @@ public static class Seed
             .RuleFor(u => u.PhoneNumberConfirmed, f => true)
             .RuleFor(u => u.NationalId, f => f.Person.Random.AlphaNumeric(15))
             .RuleFor(u => u.Gender, f => (new[] { "Female", "Male" })[new Random().Next(2)])
-            .Generate(69);
+            .Generate(50);
 
         foreach (var student in fakeStudents)
         {
@@ -282,36 +338,12 @@ public static class Seed
         context.Subjects.AddRange(fakeSubjects);
         await context.SaveChangesAsync();
 
-        var zones = new[]
-        {
-            "Abu Dhabi",
-            "Ajman",
-            "Dubai",
-            "Fujairah",
-            "Ras al-Khaimah",
-            "Sharjah",
-            "Umm al-Quwain"
-        };
-
-        var fakeCenters = new Faker<CenterEntity>("ar")
-            .RuleFor(s => s.Id, f => Guid.NewGuid())
-            .RuleFor(s => s.Name, f => f.Lorem.Word())
-            .RuleFor(s => s.Capacity, f => f.Random.Int(5, 10000))
-            .RuleFor(s => s.IsEnabled, f => f.Random.Bool())
-            .RuleFor(s => s.Gender, f => f.Person.Gender.ToString())
-            .RuleFor(s => s.LocationUrl, f => f.Person.Avatar)
-            .RuleFor(s => s.Zone, f => f.Random.ArrayElement(zones))
-            .Generate(50);
-
-        context.Centers.AddRange(fakeCenters);
-        await context.SaveChangesAsync();
-
         var fakeExamDates = new Faker<ExamDateEntity>()
             .RuleFor(s => s.Id, f => Guid.NewGuid())
             .RuleFor(s => s.Date, f => f.Date.Between(DateTime.UtcNow.AddYears(-1), DateTime.UtcNow.AddYears(1)))
             .RuleFor(s => s.OpeningDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-2), DateTime.UtcNow.AddYears(2)))
             .RuleFor(s => s.ClosingDate, f => f.Date.Between(DateTime.UtcNow.AddYears(-3), DateTime.UtcNow.AddYears(3)))
-            .Generate(75);
+            .Generate(50);
 
         context.ExamDates.AddRange(fakeExamDates);
         await context.SaveChangesAsync();

@@ -3,7 +3,6 @@
 [Route("api/v{version:apiVersion}/examDates")]
 [ApiController]
 [ApiVersion("1.0")]
-[Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
 public sealed class ExamDatesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -28,6 +27,7 @@ public sealed class ExamDatesController : ControllerBase
     /// <response code="200">Returns the all the exam dates.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -68,6 +68,7 @@ public sealed class ExamDatesController : ControllerBase
     /// <response code="401">User does not exist.</response>    
     /// <response code="404">No exam date matches this id.</response>
     /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize]
     [HttpGet("{examDateId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -112,6 +113,7 @@ public sealed class ExamDatesController : ControllerBase
     /// <response code="400">Validation errors.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -133,6 +135,46 @@ public sealed class ExamDatesController : ControllerBase
         return NoContent();
     }
 
+
+    /// <summary>
+    /// Create an exam date endpoint with the center admin.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns not content.</returns>
+    /// <remarks>
+    /// Sample request:
+    /// 
+    ///     POST /32ac4612-3721-4428-85ec-d6606e548d15/book-exam-date
+    ///     { }
+    /// </remarks>
+    /// <response code="204">Returns not content.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeCenterAdmin)]
+    [HttpPost("{examDateId}/book-exam-date")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> BookExamDate(
+        [FromRoute] Guid examDateId,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new ExamDateBookingByCenterAdminProcess.Request
+            {
+                ExamDateId = examDateId
+            }, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
+
+
     /// <summary>
     /// Updated a exam date endpoint.
     /// </summary>
@@ -153,6 +195,7 @@ public sealed class ExamDatesController : ControllerBase
     /// <response code="400">Validation errors.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpPut("{examDateId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -189,6 +232,7 @@ public sealed class ExamDatesController : ControllerBase
     /// <response code="204">Returns not content.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeSuperAdmin)]
     [HttpDelete("{examDateId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

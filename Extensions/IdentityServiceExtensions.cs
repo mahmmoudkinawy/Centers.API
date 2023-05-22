@@ -48,6 +48,11 @@ public static class IdentityServiceExtensions
                 opts.RequireClaim(ClaimTypes.Role, Constants.Roles.Teacher);
             });
 
+            builder.AddPolicy(Constants.Policies.MustBeCenterAdmin, opts =>
+            {
+                opts.RequireClaim(ClaimTypes.Role, Constants.Roles.CenterAdmin);
+            });
+
         });
 
         return services;
