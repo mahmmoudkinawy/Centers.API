@@ -53,6 +53,46 @@ public sealed class CentersController : ControllerBase
         return Ok(response);
     }
 
+
+    /// <summary>
+    /// Get paginated center admins endpoint to list the center admins.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns the all the center admins</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /centers/admins
+    /// </remarks>
+    /// <response code="200">Returns the all center admins.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [HttpGet("admins")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCenterAdmins(
+        [FromQuery] CenterParams centerParams,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetCenterAdminsProcess.Request
+            {
+                Keyword = centerParams.Keyword,
+                PageNumber = centerParams.PageNumber,
+                PageSize = centerParams.PageSize
+            }, cancellationToken);
+
+        Response.AddPaginationHeader(
+            response.CurrentPage,
+            response.PageSize,
+            response.TotalPages,
+            response.TotalCount);
+
+        return Ok(response);
+    }
+
     /// <summary>
     /// Get center with shifts by id endpoint.
     /// </summary>
