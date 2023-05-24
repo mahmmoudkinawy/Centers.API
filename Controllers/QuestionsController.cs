@@ -1,4 +1,4 @@
-﻿namespace Centers.API.Controllers;
+﻿namespace Centers.API.Controllers;  
 
 [Route("api/v{version:apiVersion}/questions")]
 [ApiController]
@@ -136,22 +136,50 @@ public sealed class QuestionsController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     POST /questions
-    ///     {
-    ///         "text": "string",
-    ///         "type": 2,
-    ///         "choices": [
-    ///             {
-    ///                 "text": "string",
-    ///                 "isCorrect": true
-    ///             },
-    ///             {
-    ///                 "text": "string 1",
-    ///                 "isCorrect": false
-    ///             }
-    ///         ],
-    ///         "answerText": "string"
-    ///     }
+    ///    POST /questions
+    ///
+    ///    Description: Create a new question.
+    ///
+    ///    Sample Request:
+    ///
+    ///    POST /questions
+    ///    Content-Type: multipart/form-data; boundary=boundary
+    ///
+    ///   --boundary
+    ///    Content-Disposition: form-data; name="text"
+    ///    string
+    ///
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="type"
+    ///   2
+    ///   
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[0][text]"
+    ///    
+    ///   string
+    ///   
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[0][isCorrect]"
+    ///
+    ///   true
+    ///  
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[1][text]"
+    ///  
+    ///   string 1
+    /// 
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[1][isCorrect]"
+    /// 
+    ///   false
+    ///
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="answerText"
+    ///   
+    /// string
+    /// 
+    /// --boundary--
+    /// 
     /// </remarks>
     /// <response code="204">Returns not content.</response>
     /// <response code="400">Validation errors.</response>
@@ -233,26 +261,50 @@ public sealed class QuestionsController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///     PUT /questions/ce55c93a-764d-4b54-8503-de419aa641d3
-    ///     {
-    ///         "text": "string test",
-    ///         "type": 2,
-    ///         "choices": [
-    ///             {
-    ///                 "text": "string 2",
-    ///                 "isCorrect": false
-    ///             },
-    ///             {
-    ///                 "text": "string UPDATED",
-    ///                 "isCorrect": true
-    ///             },
-    ///             {
-    ///                 "text": "string UPDATED 2",
-    ///                 "isCorrect": false
-    ///             },
-    ///         ],
-    ///         "answerText": "string"
-    ///     }
+    ///    POST /questions
+    ///
+    ///    Description: Create a new question.
+    ///
+    ///    Sample Request:
+    ///
+    ///    POST /questions
+    ///    Content-Type: multipart/form-data; boundary=boundary
+    ///
+    ///   --boundary
+    ///    Content-Disposition: form-data; name="text"
+    ///    string
+    ///
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="type"
+    ///   2
+    ///   
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[0][text]"
+    ///    
+    ///   string updated
+    ///   
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[0][isCorrect]"
+    ///
+    ///   true
+    ///  
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[1][text]"
+    ///  
+    ///   string updated
+    /// 
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[1][isCorrect]"
+    /// 
+    ///   false
+    ///
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="answerText"
+    ///   
+    /// string
+    /// 
+    /// --boundary--
+    /// 
     /// </remarks>
     /// <response code="204">Returns not content.</response>
     /// <response code="400">Validation errors.</response>

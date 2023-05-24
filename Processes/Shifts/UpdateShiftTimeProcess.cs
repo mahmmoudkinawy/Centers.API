@@ -38,7 +38,10 @@ public sealed class UpdateShiftTimeProcess
                 shift.ShiftEndTime = shift.ShiftEndTime.Value.Add(request.ShiftDuration);
             }
 
-            await _context.BulkUpdateAsync(shifts, options => options.BatchSize = 1000, cancellationToken);
+            await _context.BulkUpdateAsync(shifts, new BulkConfig
+            {
+                BatchSize = 100
+            }, cancellationToken: cancellationToken);
 
             if (await _context.SaveChangesAsync(cancellationToken) > 0)
             {

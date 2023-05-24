@@ -8,6 +8,7 @@ public sealed class UpdateQuestionProcess
         public ICollection<ChoiceRequest>? Choices { get; set; } = new List<ChoiceRequest>();
         public string? AnswerText { get; set; }
         public IFormFile? ImageFile { get; set; }
+        public Guid SubjectId { get; set; }
     }
 
     public sealed class ChoiceRequest
@@ -20,8 +21,19 @@ public sealed class UpdateQuestionProcess
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        private readonly CentersDbContext _context;
+
+        public Validator(CentersDbContext context)
         {
+            _context = context ??
+                throw new ArgumentNullException(nameof(context));
+
+            RuleFor(q => q.SubjectId)
+                .NotNull()
+                .NotEmpty()
+                .Must(subjectId => _context.Subjects.Any(s => s.Id == subjectId))
+                .WithMessage("The Subject with the given ID does not exist.");
+
             RuleFor(i => i.ImageFile)
                .Must(image =>
                {
@@ -31,7 +43,10 @@ public sealed class UpdateQuestionProcess
                    }
 
                    var extension = Path.GetExtension(image.FileName).ToLower();
-                   return extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif";
+
+                   var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+
+                   return allowedExtensions.Contains(extension);
                })
                .WithMessage("Image must be a JPG, PNG, JIF, or JPEG.")
                .Must(imageData => imageData is null || imageData.Length <= 10 * 1024 * 1024)
@@ -123,6 +138,7 @@ public sealed class UpdateQuestionProcess
 
             question.Type = request.Type.ToString();
             question.Text = request.Text;
+            question.SubjectId = request.SubjectId;
             question.Choices = Enumerable.Empty<ChoiceEntity>().ToList();
 
             switch (request.Type)

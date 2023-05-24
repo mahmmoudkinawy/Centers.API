@@ -1,22 +1,35 @@
-﻿namespace Centers.API.Processes.Questions;
+﻿using EFCore.BulkExtensions;
+
+namespace Centers.API.Processes.Questions;
 public sealed class UploadQuestionsByFileProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {
         public QuestionTypeEnum Type { get; set; }
         public IFormFile File { get; set; }
+        public Guid SubjectId { get; set; }
     }
 
     public sealed class Response { }
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        private readonly CentersDbContext _context;
+
+        public Validator(CentersDbContext context)
         {
+            _context = context ??
+                throw new ArgumentNullException(nameof(context));
+
+            RuleFor(q => q.SubjectId)
+                .NotNull()
+                .NotEmpty()
+                .Must(subjectId => _context.Subjects.Any(s => s.Id == subjectId))
+                .WithMessage("The Subject with the given ID does not exist.");
+
             RuleFor(q => q.Type)
                 .NotNull()
-                .IsInEnum()
-                .Must(t => Enum.IsDefined(typeof(QuestionTypeEnum), t));
+                .Must(t => t != null && Enum.IsDefined(typeof(QuestionTypeEnum), t));
 
             RuleFor(q => q.File)
                 .NotNull()
@@ -31,7 +44,7 @@ public sealed class UploadQuestionsByFileProcess
                 })
                 .WithMessage("Only CSV and XLSX files are allowed.")
                 .When(q => q.File is not null)
-                .Must(file => file.Length > 0)
+                .Must(file => file != null && file.Length > 0)
                 .WithMessage("File is empty.")
                 .Must(file => file is not null && file.Length <= 30 * 1024 * 1024)
                 .WithMessage("File size exceeds the limit of 30 MB.");
@@ -54,15 +67,18 @@ public sealed class UploadQuestionsByFileProcess
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly CentersDbContext _context;
 
         public Handler(
             IServiceScopeFactory serviceScopeFactory,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            CentersDbContext context)
         {
             _serviceScopeFactory = serviceScopeFactory ??
                 throw new ArgumentNullException(nameof(serviceScopeFactory));
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
+            _context = context;
         }
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
@@ -88,6 +104,7 @@ public sealed class UploadQuestionsByFileProcess
                 {
                     Id = questionIdToCreate,
                     OwnerId = currentUserId,
+                    SubjectId = request.SubjectId,
                     CreatedAt = DateTime.UtcNow,
                     Type = request.Type.ToString(),
                 };
@@ -119,20 +136,12 @@ public sealed class UploadQuestionsByFileProcess
                 questions.Add(questionEntity);
             }
 
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            Task.Run(async () =>
-            {
-                using var scope = _serviceScopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
-
-                // To ensure that all the steps are completed together or none of them at all, it is necessary for it to be treated as a transaction.
-                using var transaction = await context.Database.BeginTransactionAsync();
-                await context.Answers.BulkMergeAsync(answers);
-                await context.Questions.BulkMergeAsync(questions);
-                await transaction.CommitAsync();
-
-            }, cancellationToken);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            // To ensure that all the steps are completed together or none of them at all, it is necessary for it to be treated as a transaction.
+            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+            _context.Answers.AddRange(answers);
+            _context.Questions.AddRange(questions);
+            await _context.BulkSaveChangesAsync(cancellationToken: cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
 
             return Result<Response>.Success(new Response { });
         }

@@ -7,6 +7,9 @@ public sealed class QuestionEntity
     public DateTime? CreatedAt { get; set; }
     public bool? IsApproved { get; set; }
 
+    public Guid SubjectId { get; set; }
+    public SubjectEntity Subject { get; set; }
+
     public Guid OwnerId { get; set; }
     public UserEntity Owner { get; set; }
 
