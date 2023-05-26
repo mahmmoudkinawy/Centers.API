@@ -1,4 +1,4 @@
-﻿namespace Centers.API.Controllers;  
+﻿namespace Centers.API.Controllers;
 
 [Route("api/v{version:apiVersion}/questions")]
 [ApiController]
@@ -206,6 +206,87 @@ public sealed class QuestionsController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Create a question 'MCQ-True/False-Free Text' endpoint.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns not content.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///    POST /questions
+    ///
+    ///    Description: Create a new question.
+    ///
+    ///    Sample Request:
+    ///
+    ///    POST /questions
+    ///    Content-Type: multipart/form-data; boundary=boundary
+    ///
+    ///   --boundary
+    ///    Content-Disposition: form-data; name="text"
+    ///    string
+    ///
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="type"
+    ///   2
+    ///   
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[0][text]"
+    ///    
+    ///   string
+    ///   
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[0][isCorrect]"
+    ///
+    ///   true
+    ///  
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[1][text]"
+    ///  
+    ///   string 1
+    /// 
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="choices[1][isCorrect]"
+    /// 
+    ///   false
+    ///
+    ///   --boundary
+    ///   Content-Disposition: form-data; name="answerText"
+    ///   
+    /// string
+    /// 
+    /// --boundary--
+    /// 
+    /// </remarks>
+    /// <response code="204">Returns not content.</response>
+    /// <response code="400">Validation errors.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeTeacher)]
+    [HttpPost("exam-questions-selection-by-subject/{subjectId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> SubjectExamQuestionSelection(
+        [FromBody] SubjectExamQuestionSelectionProcess.Request request,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            return BadRequest(response.Errors);
+        }
+
+        return NoContent();
+    }
+
 
     /// <summary>
     /// Endpoint for uploading a CSV file of questions.
