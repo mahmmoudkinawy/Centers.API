@@ -44,14 +44,6 @@ public sealed class SubjectExamQuestionSelectionProcess
         }
     }
 
-    //public sealed class Mapper : Profile
-    //{
-    //    public Mapper()
-    //    {
-    //        CreateMap<>
-    //    }
-    //}
-
     public sealed class Handler : IRequestHandler<Request, Result<Response>>
     {
         private readonly CentersDbContext _context;
@@ -128,6 +120,7 @@ public sealed class SubjectExamQuestionSelectionProcess
                              eds.ExamDate.ClosingDate >= DateTime.UtcNow,
                                 cancellationToken: cancellationToken);
 
+                // I understand that utilizing Auto Mapper in this situation could potentially lead to decreased performance and slower processing.
                 var examQuestionEntity = new ExamQuestionEntity
                 {
                     Id = Guid.NewGuid(),

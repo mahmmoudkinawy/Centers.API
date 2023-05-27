@@ -208,7 +208,7 @@ public sealed class QuestionsController : ControllerBase
     }
 
     /// <summary>
-    /// Create a question 'MCQ-True/False-Free Text' endpoint.
+    /// Exam questions selection by subject 'MCQ/FreeText'.
     /// </summary>
     /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
@@ -216,50 +216,16 @@ public sealed class QuestionsController : ControllerBase
     /// <remarks>
     /// Sample request:
     ///
-    ///    POST /questions
-    ///
-    ///    Description: Create a new question.
-    ///
-    ///    Sample Request:
-    ///
-    ///    POST /questions
-    ///    Content-Type: multipart/form-data; boundary=boundary
-    ///
-    ///   --boundary
-    ///    Content-Disposition: form-data; name="text"
-    ///    string
-    ///
-    ///   --boundary
-    ///   Content-Disposition: form-data; name="type"
-    ///   2
-    ///   
-    ///   --boundary
-    ///   Content-Disposition: form-data; name="choices[0][text]"
-    ///    
-    ///   string
-    ///   
-    ///   --boundary
-    ///   Content-Disposition: form-data; name="choices[0][isCorrect]"
-    ///
-    ///   true
-    ///  
-    ///   --boundary
-    ///   Content-Disposition: form-data; name="choices[1][text]"
-    ///  
-    ///   string 1
-    /// 
-    ///   --boundary
-    ///   Content-Disposition: form-data; name="choices[1][isCorrect]"
-    /// 
-    ///   false
-    ///
-    ///   --boundary
-    ///   Content-Disposition: form-data; name="answerText"
-    ///   
-    /// string
-    /// 
-    /// --boundary--
-    /// 
+    ///    POST /questions/exam-questions-selection-by-subject/F1475DDB-835D-4F8D-843E-0B0093038F75
+    ///    {
+    ///         "from": "2023-05-20T08:05:54.641Z",
+    ///         "to": "2023-05-27T08:05:54.641Z",
+    ///         "types": [
+    ///             "MCQ",
+    ///             "FreeText"
+    ///         ],
+    ///         "questionsCount": 3
+    ///    }
     /// </remarks>
     /// <response code="204">Returns not content.</response>
     /// <response code="400">Validation errors.</response>
