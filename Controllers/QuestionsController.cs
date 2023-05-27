@@ -265,7 +265,7 @@ public sealed class QuestionsController : ControllerBase
     /// <response code="400">Validation errors.</response>
     /// <response code="401">User does not exist.</response>
     /// <response code="403">You are not authorized to perform that.</response>
-    [Authorize(Policy = Constants.Policies.MustBeTeacher)]
+    [Authorize(Policy = Constants.Policies.MustBeReviewer)]
     [HttpPost("exam-questions-selection-by-subject/{subjectId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -44,6 +44,14 @@ public sealed class SubjectExamQuestionSelectionProcess
         }
     }
 
+    //public sealed class Mapper : Profile
+    //{
+    //    public Mapper()
+    //    {
+    //        CreateMap<>
+    //    }
+    //}
+
     public sealed class Handler : IRequestHandler<Request, Result<Response>>
     {
         private readonly CentersDbContext _context;
@@ -85,14 +93,59 @@ public sealed class SubjectExamQuestionSelectionProcess
                             q.CreatedAt <= request.To &&
                             request.Types.Contains(q.Type) &&
                             _context.ExamDateSubjects
-                                .Any(eds =>
-                                            eds.SubjectId == q.SubjectId &&
-                                            eds.ExamDate.ClosingDate >= DateTime.UtcNow))
+                              .Any(eds =>
+                                    eds.SubjectId == q.SubjectId &&
+                                    eds.ExamDate.ClosingDate >= DateTime.UtcNow))
                 .Take(request.QuestionsCount.Value)
                 .OrderBy(q => q.Id)
+                .AsNoTrackingWithIdentityResolution()
                 .AsQueryable();
 
-            return null;
+            if (!await query.AnyAsync(cancellationToken: cancellationToken))
+            {
+                return Result<Response>.Failure(new List<string>
+                {
+                    "We couldn't find any results that match your selected filters."
+                });
+            }
+
+            var questionsCountFromDb = await query.CountAsync(cancellationToken: cancellationToken);
+
+            if (request.QuestionsCount > questionsCountFromDb)
+            {
+                return Result<Response>.Failure(new List<string>
+                {
+                    $"Apologies, but we currently have {questionsCountFromDb} available questions that match your selected filters."
+                });
+            }
+
+            foreach (var question in query)
+            {
+                var examDate = await _context.ExamDateSubjects
+                    .Include(ed => ed.ExamDate)
+                    .FirstOrDefaultAsync(eds =>
+                             eds.SubjectId == question.SubjectId &&
+                             eds.ExamDate.ClosingDate >= DateTime.UtcNow,
+                                cancellationToken: cancellationToken);
+
+                var examQuestionEntity = new ExamQuestionEntity
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedAt = DateTime.UtcNow,
+                    Types = string.Join(",", request.Types!),
+                    QuestionId = question.Id,
+                    SubjectId = question.SubjectId,
+                    QuestionsCount = request.QuestionsCount,
+                    ExamDate = examDate.ExamDate.Date,
+                    IsCanceled = false
+                };
+
+                _context.ExamQuestions.Add(examQuestionEntity);
+            }
+
+            await _context.BulkSaveChangesAsync(cancellationToken: cancellationToken);
+
+            return Result<Response>.Success(new Response { });
         }
 
     }
