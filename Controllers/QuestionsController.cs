@@ -208,6 +208,49 @@ public sealed class QuestionsController : ControllerBase
     }
 
     /// <summary>
+    /// Get questions for exam by subject Id.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns the questions.</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///    GET /questions/exam-questions-selection-by-subject/F1475DDB-835D-4F8D-843E-0B0093038F75?pageNumber=1
+    /// </remarks>
+    /// <response code="200">Returns the questions.</response>
+    /// <response code="400">Validation errors.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [Authorize(Policy = Constants.Policies.MustBeReviewer)]
+    [HttpGet("exam-questions-by-subject/{subjectId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetQuestionsForExamBySubjectId(
+        [FromRoute] Guid subjectId,
+        [FromQuery] PaginationParams paginationParams,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetQuestionsForExamBySubjectIdProcess.Request
+            {
+                PageNumber = paginationParams.PageNumber,
+                PageSize = paginationParams.PageSize,
+                SubjectId = subjectId
+            }, cancellationToken);
+
+        Response.AddPaginationHeader(
+            response.CurrentPage,
+            response.PageSize,
+            response.TotalPages,
+            response.TotalCount);
+
+        return Ok(response);
+    }
+
+    /// <summary>
     /// Exam questions selection by subject 'MCQ/FreeText'.
     /// </summary>
     /// <param name="request"></param>
@@ -217,7 +260,8 @@ public sealed class QuestionsController : ControllerBase
     /// Sample request:
     ///
     ///    POST /questions/exam-questions-selection-by-subject/F1475DDB-835D-4F8D-843E-0B0093038F75
-    ///    {
+    ///    
+    ///     {
     ///         "from": "2023-05-20T08:05:54.641Z",
     ///         "to": "2023-05-27T08:05:54.641Z",
     ///         "types": [
@@ -226,6 +270,7 @@ public sealed class QuestionsController : ControllerBase
     ///         ],
     ///         "questionsCount": 3
     ///    }
+    ///    
     /// </remarks>
     /// <response code="204">Returns not content.</response>
     /// <response code="400">Validation errors.</response>
