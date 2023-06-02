@@ -124,17 +124,7 @@ public static class Seed
                 Gender = "Female",
                 PhoneNumber = "01208534241",
                 PhoneNumberConfirmed = true,
-                Zone = "Ajman Free Zone",
-                Center = new CenterEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Capacity = 50,
-                    Gender = "Both",
-                    IsEnabled = true,
-                    LocationUrl = "https://github.com/mahmmoud",
-                    Zone = "Abu Dhabi",
-                    Name = "Ibn Elhithem"
-                }
+                Zone = "Ajman Free Zone"
             },
             new UserEntity
             {
@@ -147,17 +137,7 @@ public static class Seed
                 Gender = "Male",
                 PhoneNumber = "01208534245",
                 PhoneNumberConfirmed = true,
-                Zone = "Fujairah",
-                Center = new CenterEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Capacity = 55,
-                    Gender = "Male",
-                    IsEnabled = true,
-                    LocationUrl = "https://facebook.com/asdpqwdqwdqwd",
-                    Zone = "Ajman",
-                    Name = "Alrahma"
-                }
+                Zone = "Fujairah"
             },
             new UserEntity
             {
@@ -170,17 +150,7 @@ public static class Seed
                 Gender = "Female",
                 PhoneNumber = "01272975803",
                 PhoneNumberConfirmed = true,
-                Zone = "Ras al-Khaimah",
-                Center = new CenterEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Capacity = 150,
-                    Gender = "Female",
-                    IsEnabled = true,
-                    LocationUrl = "https://twitter.com/asdmqwdmqmpwdqw",
-                    Zone = "Fujairah",
-                    Name = "Loma By"
-                }
+                Zone = "Ras al-Khaimah"
             },
             new UserEntity
             {

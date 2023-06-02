@@ -53,6 +53,45 @@ public sealed class CentersController : ControllerBase
         return Ok(response);
     }
 
+    /// <summary>
+    /// Get paginated centers endpoint by exam date.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Returns the all the centers</returns>
+    /// <remarks>
+    /// Sample request:
+    ///
+    ///     GET /centers/filter-by-exam-date?examDate=2023-05-08T09:26:59.123Z
+    /// </remarks>
+    /// <response code="200">Returns the all the centers.</response>
+    /// <response code="401">User does not exist.</response>
+    /// <response code="403">You are not authorized to perform that.</response>
+    [HttpGet("filter-by-exam-date")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetCentersByExamDate(
+        [FromQuery] ExamDateParams examDateParams,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new GetCentersByExamDateProcess.Request
+            {
+                PageNumber = examDateParams.PageNumber,
+                PageSize = examDateParams.PageSize,
+                ExamDate = examDateParams.ExamDate
+            }, cancellationToken);
+
+        Response.AddPaginationHeader(
+            response.CurrentPage,
+            response.PageSize,
+            response.TotalPages,
+            response.TotalCount);
+
+        return Ok(response);
+    }
+
 
     /// <summary>
     /// Get paginated center admins endpoint to list the center admins.

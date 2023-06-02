@@ -103,10 +103,17 @@ public sealed class ExamDatesController : ControllerBase
     /// Sample request:
     /// 
     ///     POST /examDates
+    ///     
     ///     {
-    ///         "date":"2023-05-08T09:26:59.123Z",
-    ///         "openingDate":"2023-06-08T09:26:59.123Z",
-    ///         "closingDate":"2023-07-08T09:26:59.123Z"
+    ///         "date": "2023-06-02T17:25:57.060Z",
+    ///         "openingDate": "2023-06-02T17:25:57.060Z",
+    ///         "closingDate": "2023-06-02T17:25:57.060Z",
+    ///         "subjectIds": [
+    ///             "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    ///         ],
+    ///         "centerIds": [
+    ///             "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    ///         ]
     ///     }
     /// </remarks>
     /// <response code="204">Returns not content.</response>

@@ -1,13 +1,11 @@
 ﻿namespace Centers.API.Processes.Centers;
-public sealed class GetCentersProcess
+public sealed class GetCentersByExamDateProcess
 {
     public sealed class Request : IRequest<PagedList<Response>>
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
-        public string? Keyword { get; set; }
-
-        // Need to add some filters like opening date ... etc.
+        public DateTime? ExamDate { get; set; }
     }
 
     public sealed class Response
@@ -36,8 +34,18 @@ public sealed class GetCentersProcess
     {
         public Mapper()
         {
-            CreateMap<CenterEntity, Response>()
-                .ForMember(dest => dest.OwnerName, opt => opt.MapFrom(src => $"{src.Owner.FirstName} {src.Owner.LastName}"));
+            CreateMap<ExamDateSubject, Response>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Center.Id))
+                .ForMember(dest => dest.OwnerName, opt => opt.MapFrom(src => $"{src.Center.Owner.FirstName} {src.Center.Owner.LastName}"))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Center.Gender))
+                .ForMember(dest => dest.Zone, opt => opt.MapFrom(src => src.Center.Zone))
+                .ForMember(dest => dest.LocationUrl, opt => opt.MapFrom(src => src.Center.LocationUrl))
+                .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.Center.Capacity))
+                .ForMember(dest => dest.IsEnabled, opt => opt.MapFrom(src => src.Center.IsEnabled))
+                .ForMember(dest => dest.LocationUrl, opt => opt.MapFrom(src => src.Center.LocationUrl))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Center.Name))
+                .ForMember(dest => dest.Shifts, opt => opt.MapFrom(src => src.Center.Shifts));
+
             CreateMap<ShiftEntity, ShiftResponse>();
         }
     }
@@ -59,24 +67,24 @@ public sealed class GetCentersProcess
 
         public async Task<PagedList<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var query = _context.Centers
-                .OrderBy(c => c.Id)
+            var query = _context.ExamDateSubjects
+                .Include(eds => eds.ExamDate)
+                .Include(eds => eds.Center)
+                    .ThenInclude(c => c.Shifts)
+                .Include(eds => eds.Subject)
+                .OrderBy(c => c.SubjectId)
                 .AsQueryable();
 
-            if (!string.IsNullOrEmpty(request.Keyword))
+            if (request.ExamDate is not null)
             {
-                query = query.Where(s =>
-                    s.Name.Contains(request.Keyword) ||
-                    s.Gender.Contains(request.Keyword) ||
-                    s.Zone.Contains(request.Keyword) ||
-                    s.LocationUrl.Contains(request.Keyword));
+                var targetDate = request.ExamDate.Value.Date;
+                query = query.Where(eds => eds.ExamDate.Date.Value.Date == targetDate);
             }
 
             return await PagedList<Response>.CreateAsync(
-                query.ProjectTo<Response>(_mapper.ConfigurationProvider),
+                query.ProjectTo<Response>(_mapper.ConfigurationProvider).AsNoTrackingWithIdentityResolution(),
                 request.PageNumber,
                 request.PageSize);
         }
     }
-
 }
