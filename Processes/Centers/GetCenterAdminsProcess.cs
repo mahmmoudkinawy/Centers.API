@@ -26,17 +26,15 @@ public sealed class GetCenterAdminsProcess
 
     public sealed class Handler : IRequestHandler<Request, PagedList<Response>>
     {
-        private readonly UserManager<UserEntity> _userManager;
         private readonly CentersDbContext _context;
         private readonly IMapper _mapper;
 
-        public Handler(UserManager<UserEntity> userManager,
+        public Handler(
             CentersDbContext context,
             IMapper mapper)
         {
-            _userManager = userManager ??
-                throw new ArgumentNullException(nameof(userManager));
-            _context = context;
+            _context = context ??
+                throw new ArgumentNullException(nameof(context));
             _mapper = mapper ??
                 throw new ArgumentNullException(nameof(mapper));
         }
