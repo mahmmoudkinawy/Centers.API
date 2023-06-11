@@ -36,7 +36,6 @@ public static class ApplicationServiceExtensions
         var dbContext = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<RoleEntity>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         try
         {
             await dbContext.Database.MigrateAsync();
@@ -46,6 +45,7 @@ public static class ApplicationServiceExtensions
         }
         catch (Exception ex)
         {
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error occurred while applying migrations.");
         }
     }
