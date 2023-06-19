@@ -13,13 +13,23 @@ public sealed class GetExamDatesProcess
         public DateTime Date { get; set; }
         public DateTime OpeningDate { get; set; }
         public DateTime ClosingDate { get; set; }
+        public ICollection<SubjectResponse> Subjects { get; set; } = new List<SubjectResponse>();
+    }
+
+    public sealed class SubjectResponse
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
     }
 
     public sealed class Mapper : Profile
     {
         public Mapper()
         {
-            CreateMap<ExamDateEntity, Response>();
+            CreateMap<ExamDateEntity, Response>()
+                .ForMember(dest => dest.Subjects, opt => opt.MapFrom(src => src.ExamDateSubjects.Select(es => es.Subject)));
+            CreateMap<SubjectEntity, SubjectResponse>();
         }
     }
 
@@ -42,6 +52,8 @@ public sealed class GetExamDatesProcess
         {
             var query = _context.ExamDates
                 .OrderBy(e => e.Id)
+                .Include(e => e.ExamDateSubjects)
+                    .ThenInclude(es => es.Subject)
                 .AsQueryable();
 
             return await PagedList<Response>.CreateAsync(

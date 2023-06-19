@@ -77,7 +77,8 @@ public static class Mapper
                     ShiftEndTime = s.ShiftEndTime.Value,
                     ShiftStartTime = s.ShiftStartTime.Value,
                 }).ToList(),
-                Zone = center.Zone
+                Zone = center.Zone,
+                
             } : null
         };
     }
