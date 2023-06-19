@@ -8,7 +8,6 @@ public sealed class CreateQuestionProcess
         public ICollection<ChoiceRequest>? Choices { get; set; } = new List<ChoiceRequest>();
         public string? AnswerText { get; set; }
         public IFormFile? ImageFile { get; set; }
-        public Guid SubjectId { get; set; }
     }
 
     public sealed class ChoiceRequest
@@ -21,19 +20,8 @@ public sealed class CreateQuestionProcess
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        private readonly CentersDbContext _context;
-
-        public Validator(CentersDbContext context)
+        public Validator()
         {
-            _context = context ??
-                throw new ArgumentNullException(nameof(context));
-
-            RuleFor(q => q.SubjectId)
-                .NotNull()
-                .NotEmpty()
-                .Must(subjectId => _context.Subjects.Any(s => s.Id == subjectId))
-                .WithMessage("The Subject with the given ID does not exist.");
-
             RuleFor(i => i.ImageFile)
                 .Must(image =>
                 {
@@ -114,13 +102,15 @@ public sealed class CreateQuestionProcess
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
+            var currentTeacherId = _httpContextAccessor.HttpContext.User.GetUserById();
+
+            var currentTeacher = await _context.Users.FindAsync(currentTeacherId);
 
             var questionEntity = new QuestionEntity
             {
                 Id = Guid.NewGuid(),
-                OwnerId = currentUserId,
-                SubjectId = request.SubjectId,
+                OwnerId = currentTeacherId,
+                SubjectId = currentTeacher.SubjectId.Value,
                 CreatedAt = DateTime.UtcNow,
                 Text = request.Text,
                 Type = request.Type.ToString()

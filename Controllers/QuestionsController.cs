@@ -298,7 +298,6 @@ public sealed class QuestionsController : ControllerBase
         return NoContent();
     }
 
-
     /// <summary>
     /// Endpoint for uploading a CSV file of questions.
     /// </summary>
@@ -463,7 +462,6 @@ public sealed class QuestionsController : ControllerBase
 
         return NoContent();
     }
-
 
     /// <summary>
     /// Remove a question endpoint by question id.

@@ -1,32 +1,18 @@
-﻿using EFCore.BulkExtensions;
-
-namespace Centers.API.Processes.Questions;
+﻿namespace Centers.API.Processes.Questions;
 public sealed class UploadQuestionsByFileProcess
 {
     public sealed class Request : IRequest<Result<Response>>
     {
         public QuestionTypeEnum Type { get; set; }
         public IFormFile File { get; set; }
-        public Guid SubjectId { get; set; }
     }
 
     public sealed class Response { }
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        private readonly CentersDbContext _context;
-
-        public Validator(CentersDbContext context)
+        public Validator()
         {
-            _context = context ??
-                throw new ArgumentNullException(nameof(context));
-
-            RuleFor(q => q.SubjectId)
-                .NotNull()
-                .NotEmpty()
-                .Must(subjectId => _context.Subjects.Any(s => s.Id == subjectId))
-                .WithMessage("The Subject with the given ID does not exist.");
-
             RuleFor(q => q.Type)
                 .NotNull()
                 .Must(t => t != null && Enum.IsDefined(typeof(QuestionTypeEnum), t));
@@ -48,7 +34,6 @@ public sealed class UploadQuestionsByFileProcess
                 .WithMessage("File is empty.")
                 .Must(file => file is not null && file.Length <= 30 * 1024 * 1024)
                 .WithMessage("File size exceeds the limit of 30 MB.");
-
         }
     }
 
@@ -78,12 +63,14 @@ public sealed class UploadQuestionsByFileProcess
                 throw new ArgumentNullException(nameof(serviceScopeFactory));
             _httpContextAccessor = httpContextAccessor ??
                 throw new ArgumentNullException(nameof(httpContextAccessor));
-            _context = context;
+            _context = context ??
+                throw new ArgumentNullException(nameof(context));
         }
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
+            var currentTeacherId = _httpContextAccessor.HttpContext.User.GetUserById();
+            var currentTeacher = await _context.Users.FindAsync(new object?[] { currentTeacherId }, cancellationToken: cancellationToken);
 
             using var stream = request.File.OpenReadStream();
             using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -103,8 +90,8 @@ public sealed class UploadQuestionsByFileProcess
                 var questionEntity = new QuestionEntity
                 {
                     Id = questionIdToCreate,
-                    OwnerId = currentUserId,
-                    SubjectId = request.SubjectId,
+                    OwnerId = currentTeacherId,
+                    SubjectId = currentTeacher.SubjectId.Value,
                     CreatedAt = DateTime.UtcNow,
                     Type = request.Type.ToString(),
                 };

@@ -8,7 +8,6 @@ public sealed class UpdateQuestionProcess
         public ICollection<ChoiceRequest>? Choices { get; set; } = new List<ChoiceRequest>();
         public string? AnswerText { get; set; }
         public IFormFile? ImageFile { get; set; }
-        public Guid SubjectId { get; set; }
     }
 
     public sealed class ChoiceRequest
@@ -21,19 +20,8 @@ public sealed class UpdateQuestionProcess
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        private readonly CentersDbContext _context;
-
-        public Validator(CentersDbContext context)
+        public Validator()
         {
-            _context = context ??
-                throw new ArgumentNullException(nameof(context));
-
-            RuleFor(q => q.SubjectId)
-                .NotNull()
-                .NotEmpty()
-                .Must(subjectId => _context.Subjects.Any(s => s.Id == subjectId))
-                .WithMessage("The Subject with the given ID does not exist.");
-
             RuleFor(i => i.ImageFile)
                .Must(image =>
                {
@@ -116,19 +104,23 @@ public sealed class UpdateQuestionProcess
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
+            var currentTeacherId = _httpContextAccessor.HttpContext?.User?.GetUserById();
 
-            var requestRouteQuery = _httpContextAccessor.HttpContext?.GetRouteData();
-
-            var questionIdFromRoute = requestRouteQuery!.Values["questionId"];
+            var questionIdFromRoute = _httpContextAccessor.HttpContext?.GetRouteValue("questionId");
 
             var questionId = Guid.Parse(questionIdFromRoute.ToString());
+
+            var currentTeacher = await _context.Users
+                .FindAsync(new object?[] { currentTeacherId }, cancellationToken: cancellationToken);
 
             var question = await _context.Questions
                 .Include(c => c.Choices)
                 .Include(a => a.Answer)
                 .Include(q => q.Images)
-                .FirstOrDefaultAsync(s => s.Id == questionId && s.OwnerId == currentUserId, cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(s => 
+                    s.Id == questionId && 
+                    s.OwnerId == currentTeacherId &&
+                    s.SubjectId == currentTeacher.SubjectId, cancellationToken: cancellationToken);
 
             if (question is null)
             {
@@ -138,7 +130,7 @@ public sealed class UpdateQuestionProcess
 
             question.Type = request.Type.ToString();
             question.Text = request.Text;
-            question.SubjectId = request.SubjectId;
+            question.SubjectId = currentTeacher.SubjectId.Value;
             question.Choices = Enumerable.Empty<ChoiceEntity>().ToList();
 
             switch (request.Type)

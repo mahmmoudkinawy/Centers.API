@@ -33,9 +33,7 @@ public sealed class UpdateQuestionStatusProcess
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var requestRouteQuery = _httpContextAccessor.HttpContext?.GetRouteData();
-
-            var questionIdFromRoute = requestRouteQuery!.Values["questionId"];
+            var questionIdFromRoute = _httpContextAccessor.HttpContext?.GetRouteValue("questionId");
 
             var questionId = Guid.Parse(questionIdFromRoute.ToString());
 

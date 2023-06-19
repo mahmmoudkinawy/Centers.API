@@ -25,17 +25,12 @@ public sealed class GetQuestionsForExamBySubjectIdProcess
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        private readonly CentersDbContext _context;
-
         public Validator(CentersDbContext context)
         {
-            _context = context ??
-                throw new ArgumentNullException(nameof(context));
-
             RuleFor(s => s.SubjectId)
                 .NotEmpty()
                 .NotNull()
-                .Must(subjectId => _context.ExamQuestions.Any(s => s.SubjectId == subjectId))
+                .Must(subjectId => context.ExamQuestions.Any(s => s.SubjectId == subjectId))
                 .WithMessage("No exam questions with the given Subject Id");
         }
     }

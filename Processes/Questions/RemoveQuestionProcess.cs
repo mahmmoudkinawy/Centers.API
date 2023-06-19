@@ -25,14 +25,20 @@ public sealed class RemoveQuestionProcess
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var currentUserId = _httpContextAccessor.HttpContext.User.GetUserById();
+            var currentTeacherId = _httpContextAccessor.HttpContext.User.GetUserById();
 
-            // I know that i cam avoid all of that if i used Cascade 
+            var currentTeacher = await _context.Users
+                .FindAsync(new object?[] { currentTeacherId }, cancellationToken: cancellationToken);
+
+            // I know that i can avoid all of that if i used Cascade 
             // But I need that.
             var question = await _context.Questions
                 .Include(c => c.Answer)
                 .Include(q => q.Images)
-                .FirstOrDefaultAsync(q => q.Id == request.QuestionId && q.OwnerId == currentUserId, cancellationToken: cancellationToken);
+                .FirstOrDefaultAsync(q =>
+                    q.Id == request.QuestionId &&
+                    q.OwnerId == currentTeacherId &&
+                    q.SubjectId == currentTeacher.SubjectId, cancellationToken: cancellationToken);
 
             if (question is null)
             {
