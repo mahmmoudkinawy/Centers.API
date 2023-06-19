@@ -12,6 +12,7 @@ public sealed class UpdateUserProcess
         public string? Email { get; set; }
         public bool? IsPhoneNumberConfirmed { get; set; } = false;
         public string? Role { get; set; }
+        public Guid? SubjectId { get; set; }
     }
 
     public sealed class Response
@@ -21,7 +22,7 @@ public sealed class UpdateUserProcess
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        public Validator(CentersDbContext context)
         {
             RuleFor(u => u.FirstName)
                 .MinimumLength(3)
@@ -105,6 +106,15 @@ public sealed class UpdateUserProcess
 
                     return roles.Contains(role);
                 });
+
+            When(u => u.Role == Constants.Roles.Teacher, () =>
+            {
+                RuleFor(u => u.SubjectId)
+                  .NotEmpty()
+                  .Must(subjectId => context.Subjects.Any(s => s.Id == subjectId))
+                  .WithMessage("Invalid SubjectId. Please select a valid subject.");
+            });
+
         }
     }
 
@@ -137,9 +147,7 @@ public sealed class UpdateUserProcess
 
         public async Task<Result<Response>> Handle(Request request, CancellationToken cancellationToken)
         {
-            var requestRouteQuery = _httpContextAccessor.HttpContext?.GetRouteData();
-
-            var userIdFromRoute = requestRouteQuery!.Values["userId"];
+            var userIdFromRoute = _httpContextAccessor.HttpContext?.GetRouteValue("userId");
 
             var userToUpdateId = Guid.Parse(userIdFromRoute.ToString());
 

@@ -13,6 +13,7 @@ public sealed class CreateUserProcess
         public string? Password { get; set; }
         public bool? IsPhoneNumberConfirmed { get; set; } = false;
         public string? Role { get; set; }
+        public Guid? SubjectId { get; set; }
     }
 
     public sealed class Response
@@ -22,7 +23,7 @@ public sealed class CreateUserProcess
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        public Validator(CentersDbContext context)
         {
             RuleFor(u => u.FirstName)
                 .MinimumLength(3)
@@ -103,6 +104,15 @@ public sealed class CreateUserProcess
 
                   return roles.Contains(role);
               });
+
+            When(u => u.Role == Constants.Roles.Teacher, () =>
+            {
+                RuleFor(u => u.SubjectId)
+                  .NotEmpty()
+                  .Must(subjectId => context.Subjects.Any(s => s.Id == subjectId))
+                  .WithMessage("Invalid SubjectId. Please select a valid subject.");
+            });
+
         }
     }
 
