@@ -104,7 +104,13 @@ public sealed class CreateQuestionProcess
         {
             var currentTeacherId = _httpContextAccessor.HttpContext.User.GetUserById();
 
-            var currentTeacher = await _context.Users.FindAsync(currentTeacherId);
+            var currentTeacher = await _context.Users
+                .FindAsync(new object?[] { currentTeacherId }, cancellationToken: cancellationToken);
+
+            if(currentTeacher.SubjectId == Guid.NewGuid() || currentTeacher.SubjectId is null)
+            {
+                return Result<Response>.Failure(new List<string> { "You are not assigned to any subjects." });
+            }
 
             var questionEntity = new QuestionEntity
             {

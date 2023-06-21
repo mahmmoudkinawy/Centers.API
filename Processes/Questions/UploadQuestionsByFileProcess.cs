@@ -101,9 +101,9 @@ public sealed class UploadQuestionsByFileProcess
                     // Later on will continue this logic.
                     case QuestionTypeEnum.MultipleChoice:
                         return Result<Response>.Failure(new List<string>
-                        {
-                            "The logic for Multiple Choice Questions and True False does not implemented yet."
-                        });
+                            {
+                                "The logic for Multiple Choice Questions and True False does not implemented yet."
+                            });
                     case QuestionTypeEnum.FreeText:
                         var answerIdToCreate = Guid.NewGuid();
                         var answerEntity = new AnswerEntity
@@ -123,12 +123,18 @@ public sealed class UploadQuestionsByFileProcess
                 questions.Add(questionEntity);
             }
 
-            // To ensure that all the steps are completed together or none of them at all, it is necessary for it to be treated as a transaction.
-            using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-            _context.Answers.AddRange(answers);
-            _context.Questions.AddRange(questions);
-            await _context.BulkSaveChangesAsync(cancellationToken: cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
+            await Task.Run(async () =>
+            {
+                using var scope = _serviceScopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<CentersDbContext>();
+
+                // To ensure that all the steps are completed together or none of them at all, it is necessary for it to be treated as a transaction.
+                using var transaction = await context.Database.BeginTransactionAsync(cancellationToken);
+                context.Answers.AddRange(answers);
+                context.Questions.AddRange(questions);
+                await context.BulkSaveChangesAsync(cancellationToken: cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+            }, cancellationToken);
 
             return Result<Response>.Success(new Response { });
         }
